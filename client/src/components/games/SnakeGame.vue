@@ -543,7 +543,7 @@ const draw = () => {
   padding: 16px;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   border-radius: 16px;
-  max-width: 500px;
+  max-width: 600px;
   margin: 0 auto;
 }
 
