@@ -60,6 +60,14 @@
           <span class="icon">🎮</span>
           <span>小游戏</span>
         </div>
+        <div class="nav-card card adventure" @click="$router.push('/adventure')">
+          <span class="icon">🗺️</span>
+          <span>大冒险</span>
+        </div>
+        <div class="nav-card card farm" @click="$router.push('/farm')">
+          <span class="icon">🌱</span>
+          <span>农场</span>
+        </div>
         <div class="nav-card card" @click="$router.push('/settings')">
           <span class="icon">⚙️</span>
           <span>设置</span>
