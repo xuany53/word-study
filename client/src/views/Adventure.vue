@@ -232,6 +232,7 @@ const doCheckIn = async () => {
 
     if (result?.isNewLocation && result.location) {
       newLocationReached.value = result.location
+      unlockedThemeName.value = result.unlockedTheme || ''
       showNewLocationModal.value = true
     }
 
@@ -247,6 +248,13 @@ const doCheckIn = async () => {
 const closeNewLocationModal = () => {
   showNewLocationModal.value = false
   newLocationReached.value = null
+  unlockedThemeName.value = ''
+}
+
+// 跳转到学习页面（带主题筛选）
+const goToLearningWithTheme = (themeId: string) => {
+  router.push(`/learning?theme=${themeId}`)
+}
 }
 </script>
 
