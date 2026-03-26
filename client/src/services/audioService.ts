@@ -182,7 +182,9 @@ function cacheAudio(word: string, url: string): void {
   // 限制缓存大小
   if (audioCache.size > 100) {
     const firstKey = audioCache.keys().next().value
-    audioCache.delete(firstKey)
+    if (firstKey) {
+      audioCache.delete(firstKey)
+    }
   }
 }
 
