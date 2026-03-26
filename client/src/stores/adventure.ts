@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import type { AdventureLocation, UserAdventureProgress, LocationWithStatus } from '@/types/adventure'
 import { adventureLocations, getCurrentLocationForDays } from '@/data/adventureLocations'
+import { getThemeForLocation } from '@/data/wordThemes'
 
 interface AdventureState {
   progress: UserAdventureProgress | null
   locations: AdventureLocation[]
+  unlockedThemes: string[]  // 已解锁的主题ID列表
   loading: boolean
 }
 
