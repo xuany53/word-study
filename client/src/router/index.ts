@@ -73,7 +73,7 @@ router.beforeEach((to, _from, next) => {
   }
 
   // 设置页面标题
-  document.title = `${to.meta.title || '单词学习'} - 百词斩式学习工具`
+  document.title = `${to.meta.title || '趣背词'} - 让背单词不再枯燥`
 })
 
 export default router
