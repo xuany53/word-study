@@ -294,17 +294,23 @@ const submitAndShowFeedback = async (isCorrect: boolean) => {
   }
 }
 
-const playAudio = () => {
-  if (currentWord.value?.pronunciation) {
-    const audio = new Audio(currentWord.value.pronunciation)
-    audio.play()
-  } else {
-    // Fallback to Web Speech API
-    if ('speechSynthesis' in window && currentWord.value) {
-      const utterance = new SpeechSynthesisUtterance(currentWord.value.word)
-      utterance.lang = 'en-US'
-      speechSynthesis.speak(utterance)
-    }
+const playAudio = async () => {
+  if (!currentWord.value || isPlayingAudio.value) return
+
+  isPlayingAudio.value = true
+
+  try {
+    await audioService.playWordAudio(
+      currentWord.value.word,
+      currentWord.value.pronunciation
+    )
+  } catch (error) {
+    console.error('Audio playback failed:', error)
+  } finally {
+    // 延迟重置，给用户视觉反馈
+    setTimeout(() => {
+      isPlayingAudio.value = false
+    }, 500)
   }
 }
 
