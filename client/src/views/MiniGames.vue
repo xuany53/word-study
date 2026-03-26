@@ -74,18 +74,32 @@
         </div>
 
         <!-- 敬请期待 -->
-        <div class="game-card card coming-soon">
+        <div class="game-card card" @click="$router.push('/adventure')">
           <div class="game-icon">🗺️</div>
           <h3 class="game-name">单词大冒险</h3>
           <p class="game-desc">探索单词世界，收集成就！</p>
-          <div class="coming-soon-badge">即将上线</div>
+          <div class="game-meta">
+            <span class="meta-item">
+              <span class="icon">🚶</span>
+              打卡探险
+            </span>
+            <span class="meta-item difficulty hard">冒险</span>
+          </div>
+          <button class="play-btn">开始冒险</button>
         </div>
 
-        <div class="game-card card coming-soon">
+        <div class="game-card card" @click="$router.push('/farm')">
           <div class="game-icon">🌱</div>
           <h3 class="game-name">单词农场</h3>
           <p class="game-desc">养成你的单词花园！</p>
-          <div class="coming-soon-badge">即将上线</div>
+          <div class="game-meta">
+            <span class="meta-item">
+              <span class="icon">🌾</span>
+              种植收获
+            </span>
+            <span class="meta-item difficulty medium">养成</span>
+          </div>
+          <button class="play-btn">进入农场</button>
         </div>
       </div>
     </div>
