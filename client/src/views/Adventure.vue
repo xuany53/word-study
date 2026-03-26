@@ -179,7 +179,7 @@ const completedLocations = computed(() =>
 const unlockedThemes = computed(() => {
   return adventureStore.unlockedThemes
     .map(themeId => getThemeById(themeId))
-    .filter((t): t is NonNullable<typeof t => t !== undefined))
+    .filter((t): t is NonNullable<ReturnType<typeof getThemeById>> => t !== undefined)
 })
 
 // 地点类型标签
