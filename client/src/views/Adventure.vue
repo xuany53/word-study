@@ -255,7 +255,6 @@ const closeNewLocationModal = () => {
 const goToLearningWithTheme = (themeId: string) => {
   router.push(`/learning?theme=${themeId}`)
 }
-}
 </script>
 
 <style scoped>
