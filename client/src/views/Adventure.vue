@@ -664,6 +664,10 @@ const goToLearningWithTheme = (themeId: string) => {
 }
 
 .rewards-earned {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 24px;
 }
 
@@ -674,6 +678,15 @@ const goToLearningWithTheme = (themeId: string) => {
   background: #fff8e1;
   padding: 8px 24px;
   border-radius: 20px;
+}
+
+.rewards-earned .theme-badge {
+  font-size: 16px;
+  font-weight: 600;
+  color: #4caf50;
+  background: #e8f5e9;
+  padding: 8px 16px;
+  border-radius: 12px;
 }
 
 .close-modal-btn {
