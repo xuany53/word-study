@@ -441,9 +441,27 @@ const nextWord = () => {
   transition: all var(--transition-fast);
 }
 
-.audio-btn:hover {
+.audio-btn:hover:not(:disabled) {
   background: var(--primary-light);
   transform: scale(1.1);
+}
+
+.audio-btn:disabled {
+  cursor: not-allowed;
+}
+
+.audio-btn.playing {
+  background: var(--primary-color);
+  animation: pulse-audio 0.5s ease infinite;
+}
+
+@keyframes pulse-audio {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
 }
 
 .phonetic {
