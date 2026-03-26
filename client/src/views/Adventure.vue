@@ -151,7 +151,7 @@ import { useAuthStore } from '@/stores'
 import { useAdventureStore } from '@/stores/adventure'
 import AdventureMap from '@/components/adventure/AdventureMap.vue'
 import type { AdventureLocation, LocationType } from '@/types/adventure'
-import { wordThemes, getThemeById } from '@/data/wordThemes'
+import { getThemeById } from '@/data/wordThemes'
 
 const router = useRouter()
 const authStore = useAuthStore()
