@@ -533,6 +533,68 @@ const goToLearningWithTheme = (themeId: string) => {
   padding: 20px;
 }
 
+/* 主题单词部分 */
+.themes-section {
+  background: white;
+  margin-top: 16px;
+}
+
+.themes-section h3 {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.themes-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.themes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.theme-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 12px;
+  border: 2px solid;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.theme-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.theme-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.theme-name {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.theme-count {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.no-themes {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 20px;
+}
+
 /* Modal */
 .modal-overlay {
   position: fixed;
