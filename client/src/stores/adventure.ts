@@ -184,6 +184,7 @@ export const useAdventureStore = defineStore('adventure', {
       if (saved) {
         this.progress = JSON.parse(saved)
       }
+      this.loadUnlockedThemes()
     }
   }
 })
