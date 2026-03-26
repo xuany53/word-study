@@ -60,6 +60,18 @@ const routes = [
     name: 'MiniGames',
     component: () => import('@/views/MiniGames.vue'),
     meta: { title: '小游戏', requiresAuth: true }
+  },
+  {
+    path: '/adventure',
+    name: 'Adventure',
+    component: () => import('@/views/Adventure.vue'),
+    meta: { title: '单词大冒险', requiresAuth: true }
+  },
+  {
+    path: '/farm',
+    name: 'Farm',
+    component: () => import('@/views/Farm.vue'),
+    meta: { title: '单词农场', requiresAuth: true }
   }
 ]
 
