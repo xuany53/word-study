@@ -7,6 +7,11 @@
           <span>←</span>
           <span>返回</span>
         </button>
+        <!-- 主题指示器 -->
+        <div v-if="currentTheme" class="theme-indicator" :style="{ borderColor: currentTheme.color }">
+          <span class="theme-icon">{{ currentTheme.icon }}</span>
+          <span class="theme-name">{{ currentTheme.name }}</span>
+        </div>
       </div>
 
       <!-- 进度条 -->
