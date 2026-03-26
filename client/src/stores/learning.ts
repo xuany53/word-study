@@ -61,11 +61,12 @@ export const useLearningStore = defineStore('learning', {
       try {
         const response = await learningApi.getTodayWords(category)
         if (response.success && response.data) {
+          const data = response.data as any
           this.todayWords = {
-            reviewWords: response.data.reviewWords || 0,
-            newWords: response.data.newWords?.length || 0,
-            reviewRecords: response.data.reviewRecords || [],
-            newWordList: response.data.newWords || []
+            reviewWords: data.reviewWords || 0,
+            newWords: data.newWords || 0,
+            reviewRecords: data.reviewRecords || [],
+            newWordList: data.newWordList || []
           }
         }
       } catch (error: any) {
