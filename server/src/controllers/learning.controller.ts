@@ -78,7 +78,7 @@ export class LearningController {
             ...r,
             word: reviewWords.find(w => w.id === r.wordId)
           })),
-          newWords
+          newWordList: newWords
         }
       })
     } catch (error) {
