@@ -26,21 +26,24 @@ export interface LearningSession {
   totalXp: number
 }
 
-// 今日学习数据
-export interface TodayLearning {
-  newWords: number
-  reviewWords: number
-  newWordList: Word[]
-  reviewRecords: ReviewRecord[]
-}
-
-// 复习记录
-export interface ReviewRecord {
+// 学习记录
+export interface LearningRecord {
   word: Word
   nextReview: Date
   lastReview: Date | null
   mastery: number
 }
+
+// 今日学习数据
+export interface TodayLearning {
+  newWords: number
+  reviewWords: number
+  newWordList: Word[]
+  reviewRecords: LearningRecord[]
+}
+
+// 复习记录 (alias for LearningRecord)
+export type ReviewRecord = LearningRecord
 
 // 学习统计
 export interface LearningStats {
