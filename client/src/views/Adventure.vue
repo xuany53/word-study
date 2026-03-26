@@ -151,6 +151,7 @@ import { useAuthStore } from '@/stores'
 import { useAdventureStore } from '@/stores/adventure'
 import AdventureMap from '@/components/adventure/AdventureMap.vue'
 import type { AdventureLocation, LocationType } from '@/types/adventure'
+import { wordThemes, getThemeById } from '@/data/wordThemes'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -160,6 +161,7 @@ const checkingIn = ref(false)
 const hasCheckedInToday = ref(false)
 const showNewLocationModal = ref(false)
 const newLocationReached = ref<AdventureLocation | null>(null)
+const unlockedThemeName = ref('')
 
 // 计算属性
 const currentLocation = computed(() => adventureStore.currentLocation)
@@ -172,6 +174,13 @@ const completedLocations = computed(() =>
     adventureStore.progress?.completedLocations.includes(l.id)
   )
 )
+
+// 已解锁的主题
+const unlockedThemes = computed(() => {
+  return adventureStore.unlockedThemes
+    .map(themeId => getThemeById(themeId))
+    .filter(Boolean)
+})
 
 // 地点类型标签
 const getTypeLabel = (type: LocationType): string => {
