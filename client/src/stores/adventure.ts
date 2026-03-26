@@ -98,18 +98,23 @@ export const useAdventureStore = defineStore('adventure', {
         lastCheckInAt: null
       }
 
-      // 标记已完成的地点
+      // 标记已完成的地点，并解锁对应主题
       for (const location of this.locations) {
         if (location.daysRequired <= streak && location.id !== currentLocation.id) {
           this.progress.completedLocations.push(location.id)
+          // 解锁主题
+          this.unlockThemeForLocation(location.id)
         }
       }
+
+      // 解锁当前位置主题
+      this.unlockThemeForLocation(currentLocation.id)
 
       this.saveProgress()
     },
 
     // 打卡前进一步
-    checkIn(): { location: AdventureLocation; isNewLocation: boolean } | null {
+    checkIn(): { location: AdventureLocation; isNewLocation: boolean; unlockedTheme?: string } | null {
       if (!this.progress) return null
 
       this.progress.totalSteps++
@@ -119,18 +124,50 @@ export const useAdventureStore = defineStore('adventure', {
       const newLocation = getCurrentLocationForDays(this.progress.totalSteps)
 
       const isNewLocation = newLocation.id !== prevLocation?.id
+      let unlockedTheme: string | undefined
 
       if (isNewLocation) {
         this.progress.completedLocations.push(prevLocation!.id)
         this.progress.currentLocationId = newLocation.id
         this.progress.currentStepInLocation = this.progress.totalSteps
+
+        // 解锁新主题
+        const theme = this.unlockThemeForLocation(newLocation.id)
+        if (theme) {
+          unlockedTheme = theme.name
+        }
       }
 
       this.saveProgress()
 
       return {
         location: newLocation,
-        isNewLocation
+        isNewLocation,
+        unlockedTheme
+      }
+    },
+
+    // 解锁地点对应的主题
+    unlockThemeForLocation(locationId: string) {
+      const theme = getThemeForLocation(locationId)
+      if (theme && !this.unlockedThemes.includes(theme.id)) {
+        this.unlockedThemes.push(theme.id)
+        this.saveUnlockedThemes()
+        return theme
+      }
+      return null
+    },
+
+    // 保存已解锁主题
+    saveUnlockedThemes() {
+      localStorage.setItem('unlockedThemes', JSON.stringify(this.unlockedThemes))
+    },
+
+    // 加载已解锁主题
+    loadUnlockedThemes() {
+      const saved = localStorage.getItem('unlockedThemes')
+      if (saved) {
+        this.unlockedThemes = JSON.parse(saved)
       }
     },
 
