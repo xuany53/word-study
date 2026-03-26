@@ -231,7 +231,7 @@ const goToChallenge = () => {
 
 .nav-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   margin-bottom: 24px;
 }
@@ -241,7 +241,7 @@ const goToChallenge = () => {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 16px;
+  padding: 20px;
   cursor: pointer;
   transition: all var(--transition-fast);
 }
@@ -255,17 +255,7 @@ const goToChallenge = () => {
   color: white;
 }
 
-.nav-card.adventure {
-  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-}
-
-.nav-card.farm {
-  background: linear-gradient(135deg, #fff8e1, #ffecb3);
-}
-
-.nav-card.highlight:hover,
-.nav-card.adventure:hover,
-.nav-card.farm:hover {
+.nav-card.highlight:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
