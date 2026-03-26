@@ -69,7 +69,7 @@ async function test() {
 
       if (words.length > 0) {
         console.log('\n   前5个单词:')
-        words.slice(0, 5).forEach((w: any, i: number) => {
+        words.slice(0, 5).forEach((w, i) => {
           console.log(`   ${i + 1}. word="${w.word}" phonetic="${w.phonetic}"`)
           if (w.word === '' || !w.word) {
             console.log('      ⚠️ 警告: word 字段为空!')
@@ -95,7 +95,7 @@ async function test() {
 
       if (todayData.data.newWordList && todayData.data.newWordList.length > 0) {
         console.log('\n   前5个新单词:')
-        todayData.data.newWordList.slice(0, 5).forEach((w: any, i: number) => {
+        todayData.data.newWordList.slice(0, 5).forEach((w, i) => {
           console.log(`   ${i + 1}. word="${w.word}" phonetic="${w.phonetic}"`)
           if (w.word === '' || !w.word) {
             console.log('      ⚠️ 警告: word 字段为空!')
