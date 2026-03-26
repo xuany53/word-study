@@ -97,8 +97,8 @@
           <div class="game-modal-content">
             <SnakeGame
               :words="words"
-              :canvas-size="380"
-              :grid-size="20"
+              :canvas-size="480"
+              :grid-size="15"
               @game-end="handleSnakeEnd"
               @exit="closeSnakeGame"
             />
