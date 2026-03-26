@@ -126,13 +126,15 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useLearningStore, useWordStore, useAuthStore } from '@/stores'
 import { wordService } from '@/services/wordService'
 import FeedbackAnimation from '@/components/learning/FeedbackAnimation.vue'
 import type { Word } from '@/types/word'
+import type { WordTheme } from '@/data/wordThemes'
 
 const router = useRouter()
+const route = useRoute()
 const learningStore = useLearningStore()
 const wordStore = useWordStore()
 const authStore = useAuthStore()
