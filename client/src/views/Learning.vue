@@ -161,6 +161,9 @@ const feedbackType = ref<'correct' | 'incorrect'>('correct')
 const lastXpGain = ref(0)
 const lastCorrectAnswer = ref('')
 
+// Audio state
+const isPlayingAudio = ref(false)
+
 const currentWord = computed(() => learningStore.currentWord)
 const progress = computed(() => learningStore.progress)
 const isLastWord = computed(() => learningStore.isSessionComplete)
