@@ -2,6 +2,9 @@
  * Game Types - 游戏相关类型定义
  */
 
+// Re-export Word type for games
+export type { Word } from './word'
+
 // 游戏类型
 export type GameType = 'snake' | 'match' | 'adventure' | 'farm'
 
