@@ -477,12 +477,13 @@ const handleMatchEnd = async (result: { score: number; xpEarned: number }) => {
   justify-content: center;
   z-index: 1000;
   padding: 16px;
+  overflow: auto;
 }
 
 .game-modal-content {
   max-width: 100%;
-  max-height: 100%;
-  overflow: auto;
+  max-height: 90vh;
+  overflow: visible;
 }
 
 /* Transitions */
