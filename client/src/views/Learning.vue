@@ -351,6 +351,27 @@ const nextWord = () => {
   color: var(--primary-color);
 }
 
+.theme-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding: 8px 16px;
+  background: var(--bg-secondary);
+  border-radius: 20px;
+  border: 2px solid;
+  font-size: 14px;
+}
+
+.theme-indicator .theme-icon {
+  font-size: 18px;
+}
+
+.theme-indicator .theme-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 .progress-bar {
   height: 8px;
   background: var(--bg-dark);
