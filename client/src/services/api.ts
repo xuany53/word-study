@@ -81,7 +81,7 @@ export const wordApi = {
 // 学习 API
 export const learningApi = {
   getTodayWords: (category?: string) =>
-    api.get<any, ApiResponse<{ reviewWords: number; newWords: number; reviewRecords: any[]; newWords: any[] }>>('/learning/today', { params: category && category !== 'all' ? { category } : {} }),
+    api.get<any, ApiResponse<{ reviewWords: number; newWords: number; reviewRecords: any[]; newWordList: any[] }>>('/learning/today', { params: category && category !== 'all' ? { category } : {} }),
 
   startSession: () =>
     api.post<any, ApiResponse<any>>('/learning/start'),
