@@ -102,12 +102,12 @@
             v-for="theme in unlockedThemes"
             :key="theme.id"
             class="theme-card"
-            :style="{ borderColor: theme.color }"
-            @click="goToLearningWithTheme(theme.id)"
+            :style="{ borderColor: theme?.color || '#4caf50' }"
+            @click="theme && goToLearningWithTheme(theme.id)"
           >
-            <span class="theme-icon">{{ theme.icon }}</span>
-            <span class="theme-name">{{ theme.name }}</span>
-            <span class="theme-count">{{ theme.words.length }} 词</span>
+            <span class="theme-icon">{{ theme?.icon || '📚' }}</span>
+            <span class="theme-name">{{ theme?.name || '未知主题' }}</span>
+            <span class="theme-count">{{ theme?.words?.length || 0 }} 词</span>
           </div>
         </div>
         <div class="no-themes" v-else>
