@@ -231,7 +231,7 @@ const goToChallenge = () => {
 
 .nav-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   margin-bottom: 24px;
 }
@@ -248,6 +248,16 @@ const goToChallenge = () => {
 
 .nav-card:hover {
   background: var(--bg-secondary);
+}
+
+.nav-card.highlight {
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+  color: white;
+}
+
+.nav-card.highlight:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .nav-card .icon {
