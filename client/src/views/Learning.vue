@@ -24,7 +24,15 @@
       <div v-if="currentWord" class="word-card card">
         <div class="word-header">
           <span class="word-text">{{ currentWord.word }}</span>
-          <button class="audio-btn" @click="playAudio" title="播放发音">🔊</button>
+          <button
+            class="audio-btn"
+            :class="{ playing: isPlayingAudio }"
+            @click="playAudio"
+            :disabled="isPlayingAudio"
+            title="播放发音"
+          >
+            {{ isPlayingAudio ? '🔈' : '🔊' }}
+          </button>
         </div>
         <div class="phonetic">{{ currentWord.phonetic }}</div>
 
