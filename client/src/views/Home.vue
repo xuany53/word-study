@@ -56,6 +56,10 @@
           <span class="icon">🏆</span>
           <span>徽章画廊</span>
         </div>
+        <div class="nav-card card highlight" @click="$router.push('/games')">
+          <span class="icon">🎮</span>
+          <span>小游戏</span>
+        </div>
         <div class="nav-card card" @click="$router.push('/settings')">
           <span class="icon">⚙️</span>
           <span>设置</span>
