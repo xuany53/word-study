@@ -1,7 +1,7 @@
 {
   "name": "word-study-server",
   "version": "1.0.0",
-  "description": "百词斩式单词学习工具 - 后端服务",
+  "description": "趣背词 - 让背单词不再枯燥",
   "main": "dist/app.js",
   "scripts": {
     "dev": "tsx watch src/app.ts",
