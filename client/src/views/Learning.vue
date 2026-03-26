@@ -147,6 +147,7 @@ const answered = ref(false)
 const showHint = ref(false)
 const allWords = ref<Word[]>([])
 const isInitialized = ref(false)
+const currentTheme = ref<WordTheme | null>(null)
 
 // Feedback state
 const showFeedback = ref(false)
