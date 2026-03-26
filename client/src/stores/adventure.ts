@@ -14,6 +14,7 @@ export const useAdventureStore = defineStore('adventure', {
   state: (): AdventureState => ({
     progress: null,
     locations: adventureLocations,
+    unlockedThemes: [],
     loading: false
   }),
 
