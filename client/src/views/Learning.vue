@@ -165,6 +165,9 @@ onMounted(async () => {
   }
 
   try {
+    // 检查是否有主题参数
+    const themeParam = route.query.theme as string | undefined
+
     // 从设置中获取 RAZ 级别
     const savedSettings = localStorage.getItem('wordStudySettings')
     const settings = savedSettings ? JSON.parse(savedSettings) : {}
@@ -174,13 +177,33 @@ onMounted(async () => {
     await wordStore.fetchWords(1, razLevel === 'all' ? undefined : razLevel)
     allWords.value = wordStore.words
 
+    // 如果有主题参数，筛选主题单词
+    if (themeParam) {
+      const { getThemeById } = await import('@/data/wordThemes')
+      const theme = getThemeById(themeParam)
+      if (theme) {
+        currentTheme.value = theme
+        // 筛选出属于该主题的单词
+        const themeWordSet = new Set(theme.words.map(w => w.toLowerCase()))
+        allWords.value = allWords.value.filter((w: any) =>
+          themeWordSet.has(w.word?.toLowerCase())
+        )
+      }
+    }
+
     // Then fetch today's learning data with RAZ level filter
     await learningStore.fetchTodayWords(razLevel)
 
-    const words = [
+    let words = [
       ...learningStore.todayWords.newWordList,
       ...learningStore.todayWords.reviewRecords.map((r: any) => r.word).filter(Boolean)
     ]
+
+    // 如果有主题筛选，也筛选学习单词
+    if (currentTheme.value) {
+      const themeWordSet = new Set(currentTheme.value.words.map(w => w.toLowerCase()))
+      words = words.filter((w: any) => themeWordSet.has(w.word?.toLowerCase()))
+    }
 
     if (words.length > 0) {
       learningStore.startSession(words.slice(0, 10), 'choice')
