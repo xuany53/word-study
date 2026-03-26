@@ -1,0 +1,14 @@
+{
+  "filePath": ".spec-workflow/specs/word-learning-app/requirements.md",
+  "currentVersion": 1,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2026-03-26T01:16:02.723Z",
+      "trigger": "initial",
+      "approvalId": "approval_1774487762712_zxrmxxdb6",
+      "approvalTitle": "百词斩式单词学习工具 - 需求文档"
+    }
+  ]
+}
