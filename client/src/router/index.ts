@@ -54,6 +54,12 @@ const routes = [
     name: 'Settings',
     component: () => import('@/views/Settings.vue'),
     meta: { title: '设置', requiresAuth: true }
+  },
+  {
+    path: '/games',
+    name: 'MiniGames',
+    component: () => import('@/views/MiniGames.vue'),
+    meta: { title: '小游戏', requiresAuth: true }
   }
 ]
 
