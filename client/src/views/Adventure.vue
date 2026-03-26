@@ -92,6 +92,28 @@
           <p>还没有获得奖励，继续探险吧！</p>
         </div>
       </div>
+
+      <!-- 已解锁主题单词 -->
+      <div class="themes-section card">
+        <h3>📚 已解锁主题单词</h3>
+        <p class="themes-hint">学习页面可筛选主题单词</p>
+        <div class="themes-grid" v-if="unlockedThemes.length > 0">
+          <div
+            v-for="theme in unlockedThemes"
+            :key="theme.id"
+            class="theme-card"
+            :style="{ borderColor: theme.color }"
+            @click="goToLearningWithTheme(theme.id)"
+          >
+            <span class="theme-icon">{{ theme.icon }}</span>
+            <span class="theme-name">{{ theme.name }}</span>
+            <span class="theme-count">{{ theme.words.length }} 词</span>
+          </div>
+        </div>
+        <div class="no-themes" v-else>
+          <p>打卡解锁主题单词包！</p>
+        </div>
+      </div>
     </div>
 
     <!-- 到达新地点弹窗 -->
@@ -110,6 +132,9 @@
             </p>
             <div class="rewards-earned">
               <span class="xp">+{{ newLocationReached?.rewards.xp || 0 }} XP</span>
+              <span v-if="unlockedThemeName" class="theme-badge">
+                📚 解锁「{{ unlockedThemeName }}」主题单词！
+              </span>
             </div>
             <button class="close-modal-btn" @click="closeNewLocationModal">继续探险</button>
           </div>
