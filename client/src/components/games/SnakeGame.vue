@@ -483,7 +483,7 @@ const draw = () => {
 
     // 单词
     ctx2.fillStyle = '#fff'
-    ctx2.font = `${size * 0.35}px Arial`
+    ctx2.font = `bold ${size * 0.38}px Arial`
     ctx2.textAlign = 'center'
     ctx2.textBaseline = 'middle'
     ctx2.fillText(food.word.slice(0, 4), x + size / 2, y + size / 2)
