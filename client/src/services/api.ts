@@ -68,7 +68,7 @@ export const authApi = {
 
 // 单词 API
 export const wordApi = {
-  getAll: (params?: { page?: number; limit?: number; category?: string; difficulty?: number }) =>
+  getAll: (params?: { page?: number; limit?: number; category?: string; difficulty?: number; source?: string; razLevel?: string; gradeLevel?: string }) =>
     api.get<any, ApiResponse<{ data: any[]; pagination: any }>>('/words', { params }),
 
   getById: (id: string) =>
@@ -80,8 +80,14 @@ export const wordApi = {
 
 // 学习 API
 export const learningApi = {
-  getTodayWords: (category?: string) =>
-    api.get<any, ApiResponse<{ reviewWords: number; newWords: number; reviewRecords: any[]; newWordList: any[] }>>('/learning/today', { params: category && category !== 'all' ? { category } : {} }),
+  getTodayWords: (filters?: { category?: string; source?: string; razLevel?: string; gradeLevel?: string }) => {
+    const params: any = {}
+    if (filters?.category && filters.category !== 'all') params.category = filters.category
+    if (filters?.source && filters.source !== 'all') params.source = filters.source
+    if (filters?.razLevel) params.razLevel = filters.razLevel
+    if (filters?.gradeLevel && filters.gradeLevel !== 'all') params.gradeLevel = filters.gradeLevel
+    return api.get<any, ApiResponse<{ reviewWords: number; newWords: number; reviewRecords: any[]; newWordList: any[] }>>('/learning/today', { params })
+  },
 
   startSession: () =>
     api.post<any, ApiResponse<any>>('/learning/start'),
