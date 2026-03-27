@@ -208,22 +208,25 @@ onMounted(async () => {
         allWords.value = allWords.value.filter((w: any) =>
           themeWordSet.has(w.word?.toLowerCase())
         )
+
+        // 主题模式：直接使用筛选后的主题单词，不依赖今日学习单词
+        if (allWords.value.length > 0) {
+          learningStore.startSession(allWords.value.slice(0, 10), 'choice')
+          isInitialized.value = true
+          await nextTick()
+          generateOptions()
+          return // 提前返回，跳过下面的今日学习逻辑
+        }
       }
     }
 
-    // Then fetch today's learning data with RAZ level filter
+    // 非主题模式：使用今日学习单词
     await learningStore.fetchTodayWords(razLevel)
 
     let words = [
       ...learningStore.todayWords.newWordList,
       ...learningStore.todayWords.reviewRecords.map((r: any) => r.word).filter(Boolean)
     ]
-
-    // 如果有主题筛选，也筛选学习单词
-    if (currentTheme.value) {
-      const themeWordSet = new Set(currentTheme.value.words.map(w => w.toLowerCase()))
-      words = words.filter((w: any) => themeWordSet.has(w.word?.toLowerCase()))
-    }
 
     if (words.length > 0) {
       learningStore.startSession(words.slice(0, 10), 'choice')
