@@ -658,10 +658,42 @@ const nextWord = async () => {
   border-top: 1px solid var(--bg-dark);
 }
 
+.example-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
 .example-sentence {
   color: var(--text-primary);
   font-style: italic;
-  margin-bottom: 8px;
+  flex: 1;
+}
+
+.example-audio-btn {
+  background: var(--bg-secondary);
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.example-audio-btn:hover:not(:disabled) {
+  background: var(--primary-light);
+  transform: scale(1.1);
+}
+
+.example-audio-btn:disabled {
+  cursor: not-allowed;
+}
+
+.example-audio-btn.playing {
+  background: var(--primary-color);
+  animation: pulse-audio 0.5s ease infinite;
 }
 
 .example .translation {
