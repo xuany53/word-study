@@ -283,6 +283,9 @@ watch(currentWord, () => {
 const generateOptions = () => {
   if (!currentWord.value) return
 
+  // 40% 概率是中文→英文题型
+  questionType.value = Math.random() < 0.4 ? 'meaning-to-word' : 'word-to-meaning'
+
   // If allWords is empty, use the session words as fallback
   const wordPool = allWords.value.length > 0
     ? allWords.value
@@ -290,7 +293,42 @@ const generateOptions = () => {
 
   if (wordPool.length === 0) return
 
-  options.value = wordService.generateOptions(currentWord.value, wordPool, 4)
+  if (questionType.value === 'meaning-to-word') {
+    // 中文→英文 题型：选项是英文单词
+    options.value = wordService.generateOptions(currentWord.value, wordPool, 4)
+  } else {
+    // 英文→中文 题型：选项是中文释义
+    const correctMeaning = currentWord.value.meanings?.[0]?.translation || currentWord.value.meanings?.[0]?.definition || ''
+
+    // 获取其他单词的中文释义作为错误选项
+    const otherMeanings = wordPool
+      .filter((w: any) => w.id !== currentWord.value?.id)
+      .map((w: any) => w.meanings?.[0]?.translation || w.meanings?.[0]?.definition || '')
+      .filter((m: string) => m && m !== correctMeaning)
+
+    // 随机选3个错误选项
+    const shuffled = otherMeanings.sort(() => Math.random() - 0.5)
+    const wrongOptions = shuffled.slice(0, 3)
+
+    // 如果不够3个，添加占位符
+    while (wrongOptions.length < 3) {
+      wrongOptions.push(`选项${wrongOptions.length + 1}`)
+    }
+
+    // 合并并打乱
+    const allOptions = [correctMeaning, ...wrongOptions]
+    options.value = allOptions.sort(() => Math.random() - 0.5)
+  }
+}
+
+// 判断选项是否正确
+const isCorrectOption = (option: string) => {
+  if (questionType.value === 'meaning-to-word') {
+    return option === currentWord.value?.word
+  } else {
+    const correctMeaning = currentWord.value?.meanings?.[0]?.translation || currentWord.value?.meanings?.[0]?.definition || ''
+    return option === correctMeaning
+  }
 }
 
 const resetState = () => {
