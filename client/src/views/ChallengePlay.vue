@@ -34,8 +34,24 @@
       <!-- 单词卡片 -->
       <div v-if="currentWord && !showResult" class="word-card-wrapper">
         <div class="word-card">
-          <div class="word">{{ currentWord.word }}</div>
-          <div class="phonetic">{{ currentWord.phonetic }}</div>
+          <!-- 题型指示器 -->
+          <div class="question-type-badge">
+            {{ questionType === 'word-to-meaning' ? '📝 英文→中文' : '🔤 中文→英文' }}
+          </div>
+
+          <!-- 英文→中文 题型：显示英文单词 -->
+          <template v-if="questionType === 'word-to-meaning'">
+            <div class="word">{{ currentWord.word }}</div>
+            <div class="phonetic">{{ currentWord.phonetic }}</div>
+          </template>
+
+          <!-- 中文→英文 题型：显示中文释义 -->
+          <template v-else>
+            <div class="word meaning-display">
+              {{ currentWord.meaning || (currentWord as any).meanings?.[0]?.translation || '' }}
+            </div>
+            <div class="phonetic hint-text">请选择正确的英文单词</div>
+          </template>
 
           <!-- 选项 -->
           <div class="options">
