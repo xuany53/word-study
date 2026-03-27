@@ -10,61 +10,64 @@
         <h1>⚙️ 设置</h1>
       </div>
 
-      <!-- RAZ分级设置 -->
+      <!-- 单词筛选设置 -->
       <div class="settings-section card">
-        <h2>📚 RAZ分级设置</h2>
-        <p class="section-desc">选择适合你的阅读级别，系统将为你推荐对应难度的单词</p>
+        <h2>📚 单词筛选</h2>
+        <p class="section-desc">选择学习单词的来源和难度</p>
 
+        <!-- 数据来源 -->
         <div class="setting-item">
-          <label>当前学习级别</label>
-          <select v-model="settings.razLevel" class="input level-select">
-            <option value="all">全部级别</option>
-            <optgroup label="初级 (Level aa-C)">
-              <option value="raz-aa">aa 级 - 入门</option>
-              <option value="raz-a">A 级 - 基础</option>
-              <option value="raz-b">B 级 - 进阶基础</option>
-              <option value="raz-c">C 级 - 初级</option>
-            </optgroup>
-            <optgroup label="中级 (Level D-F)">
-              <option value="raz-d">D 级 - 中级入门</option>
-              <option value="raz-e">E 级 - 中级</option>
-              <option value="raz-f">F 级 - 中级进阶</option>
-            </optgroup>
-            <optgroup label="中高级 (Level G-K)">
-              <option value="raz-g">G 级 - 中高级</option>
-              <option value="raz-h">H 级 - 中高级进阶</option>
-              <option value="raz-i">I 级 - 高级入门</option>
-              <option value="raz-j">J 级 - 高级</option>
-              <option value="raz-k">K 级 - 高级进阶</option>
-            </optgroup>
-            <optgroup label="高级 (Level L-P)">
-              <option value="raz-l">L 级</option>
-              <option value="raz-m">M 级</option>
-              <option value="raz-n">N 级</option>
-              <option value="raz-o">O 级</option>
-              <option value="raz-p">P 级</option>
-            </optgroup>
-            <optgroup label="专家级 (Level Q-Z)">
-              <option value="raz-q">Q 级 - 专家入门</option>
-              <option value="raz-r">R 级</option>
-              <option value="raz-s">S 级</option>
-              <option value="raz-t">T 级</option>
-              <option value="raz-u">U 级 - 专家</option>
-              <option value="raz-v">V 级</option>
-              <option value="raz-w">W 级</option>
-              <option value="raz-x">X 级</option>
-              <option value="raz-y">Y 级</option>
-              <option value="raz-z">Z 级 - 最高级</option>
-            </optgroup>
+          <label>数据来源</label>
+          <select v-model="settings.source" class="input" @change="updateWordCount">
+            <option value="all">全部词汇</option>
+            <option value="汇总">汇总词汇 ({{ sourceCounts.汇总 }})</option>
+            <option value="RAZ分级">RAZ分级词汇 ({{ sourceCounts['RAZ分级'] }})</option>
           </select>
         </div>
 
-        <div class="level-info" v-if="settings.razLevel !== 'all'">
-          <div class="level-badge" :class="getLevelClass(settings.razLevel)">
-            {{ getLevelDisplayName(settings.razLevel) }}
+        <!-- RAZ级别多选 -->
+        <div class="setting-item vertical" v-if="settings.source !== '汇总'">
+          <label>RAZ级别（可多选）</label>
+          <div class="level-grid">
+            <button
+              v-for="level in razLevels"
+              :key="level.value"
+              class="level-btn"
+              :class="{ active: settings.razLevels.includes(level.value) }"
+              @click="toggleLevel(level.value)"
+            >
+              {{ level.label }}
+            </button>
           </div>
-          <p class="level-desc">{{ getLevelDescription(settings.razLevel) }}</p>
-          <p class="word-count">该级别单词数: {{ getLevelWordCount(settings.razLevel) }}</p>
+          <div class="selected-count" v-if="settings.razLevels.length > 0">
+            已选 {{ settings.razLevels.length }} 个级别，共 {{ selectedRazWordCount }} 个单词
+          </div>
+        </div>
+
+        <!-- 年级筛选 -->
+        <div class="setting-item vertical">
+          <label>年级筛选（可多选）</label>
+          <div class="grade-grid">
+            <button
+              v-for="grade in gradeLevels"
+              :key="grade.value"
+              class="grade-btn"
+              :class="{ active: settings.gradeLevels.includes(grade.value) }"
+              @click="toggleGrade(grade.value)"
+            >
+              <span class="grade-icon">{{ grade.icon }}</span>
+              <span class="grade-name">{{ grade.label }}</span>
+              <span class="grade-count">{{ grade.count }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 当前筛选统计 -->
+        <div class="filter-summary">
+          <div class="summary-item">
+            <span class="summary-label">筛选结果:</span>
+            <span class="summary-value">{{ filteredWordCount }} 个单词</span>
+          </div>
         </div>
       </div>
 
