@@ -8,6 +8,36 @@
 
 ---
 
+## 功能特性
+
+### 🔐 用户认证
+
+- **登录验证**: 学习相关页面需要登录才能访问
+- **路由守卫**: 自动检测登录状态，未登录用户跳转到登录页
+- **保护页面**: 学习、统计、闯关、徽章、设置等页面均需登录
+
+### 📚 学习功能
+
+- **多种学习模式**: 选择题、拼写模式
+- **自动播放发音**: 显示新单词时自动播放读音
+- **手动发音按钮**: 可点击喇叭图标重新播放
+- **闯关模式题型**: 40% 概率出现中文→英文题型
+
+### 🔊 音效反馈
+
+- **正确提示音**: 播放 "excellent" 语音，给予积极反馈
+- **错误提示音**: 下降音调，温和提示
+- **音效开关**: 可在设置中开启/关闭
+
+### ✅ 打卡机制
+
+- **自动打卡**: 完成一组学习后自动打卡，无需手动操作
+- **打卡限制**: 每日学习未达标时禁止手动打卡
+- **达标标准**: 根据设置中的"每日新词数量"判断（默认20个）
+- **提示信息**: 显示"今日已学 X 个单词，需完成 Y 个才能打卡"
+
+---
+
 ## 单词数据库
 
 ### 数据统计（2026-03-27更新）
@@ -390,6 +420,69 @@ feat(learning): 实现单词卡片组件
 
 Closes #123
 ```
+
+---
+
+## 音频服务
+
+### 功能概述
+
+`audioService.ts` 提供单词发音和音效播放功能。
+
+### 核心方法
+
+```typescript
+// 播放单词发音
+playWordAudio(word: string, pronunciationUrl?: string): Promise<boolean>
+
+// 播放正确提示音 ("excellent" 语音)
+playCorrectSound(): void
+
+// 播放错误提示音 (下降音调)
+playWrongSound(): void
+
+// 停止当前音频
+stopCurrentAudio(): void
+```
+
+### 音频源优先级
+
+1. 提供的音频 URL
+2. 缓存的音频
+3. 有道词典 TTS（国内可用）
+4. Web Speech API（最终回退）
+
+---
+
+## 打卡逻辑
+
+### 自动打卡流程
+
+```
+用户完成学习 → 调用 nextWord() → 判断是否最后一个单词
+    ↓
+是最后一个 → 调用 statsStore.checkIn() → 自动打卡
+    ↓
+跳转到统计页面
+```
+
+### 手动打卡限制
+
+```typescript
+// 从设置中获取每日目标
+const dailyGoal = settings.dailyNewWords || 20
+
+// 计算今日已学单词数
+const todayLearnedWords = todayStats.newWords + todayStats.review
+
+// 判断是否可以打卡
+const canCheckIn = todayLearnedWords >= dailyGoal
+```
+
+### 后端处理
+
+- 重复打卡返回 400 错误 "Already checked in today"
+- 前端用 try-catch 捕获，不影响用户体验
 
 ---
 
