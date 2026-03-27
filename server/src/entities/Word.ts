@@ -41,6 +41,12 @@ export class Word {
   @Column({ type: 'varchar', nullable: true })
   gradeLevel: string // 小学/初中/高中
 
+  @Column({ type: 'varchar', nullable: true })
+  source: string // 汇总/RAZ分级
+
+  @Column({ type: 'varchar', nullable: true })
+  razLevel: string // AA, A, B, C... Z2
+
   @Column({ type: 'int', default: 1 })
   difficulty: number
 
