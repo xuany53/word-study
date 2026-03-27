@@ -7,16 +7,34 @@ export class WordController {
 
   getAllWords = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { page = 1, limit = 50, category, difficulty } = req.query
+      const { page = 1, limit = 50, category, difficulty, source, razLevel, gradeLevel } = req.query
 
       const queryBuilder = this.wordRepository.createQueryBuilder('word')
 
+      // 按分类筛选（兼容旧逻辑）
       if (category) {
         queryBuilder.andWhere('word.category = :category', { category })
       }
 
+      // 按难度筛选
       if (difficulty) {
         queryBuilder.andWhere('word.difficulty = :difficulty', { difficulty })
+      }
+
+      // 按来源筛选：汇总/RAZ分级
+      if (source) {
+        queryBuilder.andWhere('word.source = :source', { source })
+      }
+
+      // 按RAZ级别筛选（支持多选，逗号分隔，如 "a,b,c"）
+      if (razLevel) {
+        const levels = String(razLevel).split(',').map(l => l.trim().toLowerCase())
+        queryBuilder.andWhere('word.razLevel IN (:...levels)', { levels })
+      }
+
+      // 按年级筛选（小学/初中/高中）
+      if (gradeLevel) {
+        queryBuilder.andWhere('word.gradeLevel = :gradeLevel', { gradeLevel })
       }
 
       const [words, total] = await queryBuilder
