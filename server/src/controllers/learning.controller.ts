@@ -12,7 +12,7 @@ export class LearningController {
   getTodayWords = async (req: Request, res: Response): Promise<void> => {
     try {
       const userId = (req as any).userId
-      const { category } = req.query // 获取 RAZ 级别过滤
+      const { category, source, razLevel, gradeLevel } = req.query
       const today = new Date()
       today.setHours(0, 0, 0, 0)
 
@@ -30,10 +30,8 @@ export class LearningController {
         let wordsQuery = this.wordRepository.createQueryBuilder('word')
           .where('word.id IN (:...wordIds)', { wordIds })
 
-        // 如果有分类过滤，添加条件
-        if (category && category !== 'all') {
-          wordsQuery = wordsQuery.andWhere('word.category = :category', { category })
-        }
+        // 应用筛选条件
+        wordsQuery = this.applyFilters(wordsQuery, category, source, razLevel, gradeLevel)
 
         reviewWords = await wordsQuery.getMany()
       }
@@ -53,18 +51,12 @@ export class LearningController {
 
       let newWordsQuery = this.wordRepository.createQueryBuilder('word')
 
-      // 如果有分类过滤，添加条件
-      if (category && category !== 'all') {
-        newWordsQuery = newWordsQuery.where('word.category = :category', { category })
-      }
+      // 应用筛选条件
+      newWordsQuery = this.applyFilters(newWordsQuery, category, source, razLevel, gradeLevel)
 
       // 排除已学习的单词
       if (learnedIds.length > 0) {
-        if (category && category !== 'all') {
-          newWordsQuery = newWordsQuery.andWhere('word.id NOT IN (:...learnedIds)', { learnedIds })
-        } else {
-          newWordsQuery = newWordsQuery.where('word.id NOT IN (:...learnedIds)', { learnedIds })
-        }
+        newWordsQuery = newWordsQuery.andWhere('word.id NOT IN (:...learnedIds)', { learnedIds })
       }
 
       const newWords = await newWordsQuery.take(dailyNewWords).getMany()
@@ -88,6 +80,32 @@ export class LearningController {
         message: 'Internal server error'
       })
     }
+  }
+
+  // 应用筛选条件的辅助方法
+  private applyFilters(queryBuilder: any, category: any, source: any, razLevel: any, gradeLevel: any) {
+    // 按分类筛选（兼容旧逻辑）
+    if (category && category !== 'all') {
+      queryBuilder = queryBuilder.andWhere('word.category = :category', { category })
+    }
+
+    // 按来源筛选：汇总/RAZ分级
+    if (source && source !== 'all') {
+      queryBuilder = queryBuilder.andWhere('word.source = :source', { source })
+    }
+
+    // 按RAZ级别筛选（支持多选，逗号分隔）
+    if (razLevel && razLevel !== 'all') {
+      const levels = String(razLevel).split(',').map(l => l.trim().toLowerCase())
+      queryBuilder = queryBuilder.andWhere('word.razLevel IN (:...levels)', { levels })
+    }
+
+    // 按年级筛选
+    if (gradeLevel && gradeLevel !== 'all') {
+      queryBuilder = queryBuilder.andWhere('word.gradeLevel = :gradeLevel', { gradeLevel })
+    }
+
+    return queryBuilder
   }
 
   startSession = async (req: Request, res: Response): Promise<void> => {
