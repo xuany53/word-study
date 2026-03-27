@@ -344,6 +344,94 @@ export function playWrongSound(): void {
   }
 }
 
+/**
+ * 播放句子/例句朗读
+ * @param sentence - 要朗读的句子
+ * @returns Promise<boolean> 是否播放成功
+ */
+export async function playSentenceAudio(sentence: string): Promise<boolean> {
+  if (!sentence) return false
+
+  try {
+    // 停止当前播放
+    stopCurrentAudio()
+
+    // 1. 尝试使用有道 TTS（支持句子朗读）
+    const youdaoUrl = `https://dict.youdao.com/dictvoice?type=1&audio=${encodeURIComponent(sentence)}`
+    const success = await playAudioUrl(youdaoUrl, 8000) // 句子较长，给更长超时
+    if (success) return true
+
+    // 2. Fallback: 使用 Web Speech API
+    return await playSentenceWithWebSpeech(sentence)
+  } catch (error) {
+    console.error('Sentence audio playback error:', error)
+    // 最终 fallback
+    return await playSentenceWithWebSpeech(sentence)
+  }
+}
+
+/**
+ * 使用 Web Speech API 朗读句子
+ */
+async function playSentenceWithWebSpeech(sentence: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (!('speechSynthesis' in window)) {
+      resolve(false)
+      return
+    }
+
+    // 取消之前的播放
+    speechSynthesis.cancel()
+
+    const utterance = new SpeechSynthesisUtterance(sentence)
+    utterance.lang = 'en-US'
+    utterance.rate = 0.85
+    utterance.pitch = 1
+    utterance.volume = 1
+
+    // 获取语音列表
+    const getVoices = (): SpeechSynthesisVoice[] => {
+      return speechSynthesis.getVoices()
+    }
+
+    let voices = getVoices()
+    if (voices.length === 0) {
+      // 等待语音加载
+      speechSynthesis.addEventListener('voiceschanged', () => {
+        voices = getVoices()
+        setVoice(voices)
+      }, { once: true })
+    } else {
+      setVoice(voices)
+    }
+
+    function setVoice(voiceList: SpeechSynthesisVoice[]) {
+      const englishVoice = voiceList.find(v =>
+        v.lang.startsWith('en') && (v.name.includes('Female') || v.name.includes('Samantha'))
+      ) || voiceList.find(v => v.lang.startsWith('en'))
+
+      if (englishVoice) {
+        utterance.voice = englishVoice
+      }
+    }
+
+    utterance.onend = () => resolve(true)
+    utterance.onerror = () => resolve(false)
+
+    // 延迟播放，确保准备就绪
+    setTimeout(() => {
+      speechSynthesis.speak(utterance)
+    }, 100)
+  })
+}
+
+    oscillator.start(audioContext.currentTime)
+    oscillator.stop(audioContext.currentTime + 0.3)
+  } catch (error) {
+    console.error('Play wrong sound error:', error)
+  }
+}
+
 export default {
   playWordAudio,
   stopCurrentAudio,
