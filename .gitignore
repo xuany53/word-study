@@ -54,6 +54,10 @@ coverage/
 # Claude Code
 .claude/
 .gstack/
+.spec-workflow/
+
+# Docs (private)
+docs/
 
 # Docs drafts
 docs/drafts/
