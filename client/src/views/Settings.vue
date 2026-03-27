@@ -152,7 +152,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, onMounted, ref, watch } from 'vue'
+import { reactive, onMounted, ref, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores'
 import { authApi } from '@/services/api'
@@ -162,7 +162,9 @@ const authStore = useAuthStore()
 const showSaved = ref(false)
 
 const settings = reactive({
-  razLevel: 'all',
+  source: 'all', // all / 汇总 / RAZ分级
+  razLevels: [] as string[], // 多选RAZ级别
+  gradeLevels: [] as string[], // 多选年级
   dailyNewWords: 20,
   learningMode: 'choice',
   soundEnabled: true,
@@ -172,67 +174,115 @@ const settings = reactive({
   theme: 'auto'
 })
 
-// RAZ级别描述
-const levelDescriptions: Record<string, string> = {
-  'raz-aa': '最基础词汇，适合零基础学习者。包含数字、颜色、动物等基本概念。',
-  'raz-a': '基础动词和名词，开始学习简单动作和日常用语。',
-  'raz-b': '形容词和常用词汇，学习描述事物特征。',
-  'raz-c': '时间、日期词汇，扩展日常生活表达。',
-  'raz-d': '自然和季节词汇，描述环境和天气。',
-  'raz-e': '感官动词，学习表达感觉和动作。',
-  'raz-f': '疑问词和基础语法词汇。',
-  'raz-g': '频率副词和不定代词。',
-  'raz-h': '时间介词和方位词。',
-  'raz-i': '动词时态和状态表达。',
-  'raz-j': '情态动词和意愿表达。',
-  'raz-k': '情态动词进阶。',
-  'raz-l': '比较级和最高级。',
-  'raz-m': '形容词和副词扩展。',
-  'raz-n': '形容词进阶。',
-  'raz-o': '可能性词汇。',
-  'raz-p': '安全和健康词汇。',
-  'raz-q': '认知动词。',
-  'raz-r': '思维和学习词汇。',
-  'raz-s': '思考和判断词汇。',
-  'raz-t': '成功和进步词汇。',
-  'raz-u': '环境和经验词汇。',
-  'raz-v': '高级概念词汇。',
-  'raz-w': '性格和品质词汇。',
-  'raz-x': '高级品质词汇。',
-  'raz-y': '高级情感词汇。',
-  'raz-z': '最高级词汇，接近母语水平。'
-}
+// 数据来源统计
+const sourceCounts = reactive({
+  '汇总': 6465,
+  'RAZ分级': 13473
+})
 
-const getLevelDisplayName = (level: string): string => {
-  if (level === 'all') return '全部'
-  return level.replace('raz-', '').toUpperCase() + ' 级'
-}
+// RAZ级别列表
+const razLevels = [
+  { value: 'aa', label: 'AA', count: 433 },
+  { value: 'a', label: 'A', count: 495 },
+  { value: 'b', label: 'B', count: 477 },
+  { value: 'c', label: 'C', count: 492 },
+  { value: 'd', label: 'D', count: 464 },
+  { value: 'e', label: 'E', count: 455 },
+  { value: 'f', label: 'F', count: 462 },
+  { value: 'g', label: 'G', count: 453 },
+  { value: 'h', label: 'H', count: 418 },
+  { value: 'i', label: 'I', count: 440 },
+  { value: 'j', label: 'J', count: 460 },
+  { value: 'k', label: 'K', count: 430 },
+  { value: 'l', label: 'L', count: 442 },
+  { value: 'm', label: 'M', count: 437 },
+  { value: 'n', label: 'N', count: 407 },
+  { value: 'o', label: 'O', count: 464 },
+  { value: 'p', label: 'P', count: 409 },
+  { value: 'q', label: 'Q', count: 483 },
+  { value: 'r', label: 'R', count: 467 },
+  { value: 's', label: 'S', count: 462 },
+  { value: 't', label: 'T', count: 471 },
+  { value: 'u', label: 'U', count: 459 },
+  { value: 'v', label: 'V', count: 446 },
+  { value: 'w', label: 'W', count: 431 },
+  { value: 'x', label: 'X', count: 601 },
+  { value: 'y', label: 'Y', count: 514 },
+  { value: 'z', label: 'Z', count: 447 },
+  { value: 'z1', label: 'Z1', count: 516 },
+  { value: 'z2', label: 'Z2', count: 538 }
+]
 
-const getLevelClass = (level: string): string => {
-  const levelNum = level.replace('raz-', '')
-  if (['aa', 'a', 'b', 'c'].includes(levelNum)) return 'level-beginner'
-  if (['d', 'e', 'f'].includes(levelNum)) return 'level-elementary'
-  if (['g', 'h', 'i', 'j', 'k'].includes(levelNum)) return 'level-intermediate'
-  if (['l', 'm', 'n', 'o', 'p'].includes(levelNum)) return 'level-advanced'
-  return 'level-expert'
-}
+// 年级列表
+const gradeLevels = [
+  { value: '小学', label: '小学', icon: '🎒', count: 1946 },
+  { value: '初中', label: '初中', icon: '📖', count: 3027 },
+  { value: '高中', label: '高中', icon: '🎓', count: 3510 }
+]
 
-const getLevelDescription = (level: string): string => {
-  return levelDescriptions[level] || ''
-}
+// 计算选中的RAZ级别单词数
+const selectedRazWordCount = computed(() => {
+  if (settings.razLevels.length === 0) return 0
+  return razLevels
+    .filter(l => settings.razLevels.includes(l.value))
+    .reduce((sum, l) => sum + l.count, 0)
+})
 
-const getLevelWordCount = (level: string): number => {
-  // 真实数据库统计数据 (2026-03-26 更新)
-  const counts: Record<string, number> = {
-    'raz-aa': 61, 'raz-a': 65, 'raz-b': 62, 'raz-c': 50,
-    'raz-d': 50, 'raz-e': 50, 'raz-f': 40, 'raz-g': 30,
-    'raz-h': 5, 'raz-i': 16, 'raz-j': 7, 'raz-k': 5,
-    'raz-l': 10, 'raz-m': 12, 'raz-n': 6, 'raz-o': 5,
-    'raz-p': 3, 'raz-q': 22, 'raz-r': 4, 'raz-s': 4,
-    'raz-t': 4, 'raz-u': 7, 'raz-v': 3, 'raz-w': 3,
-    'raz-x': 3, 'raz-y': 2, 'raz-z': 4
+// 计算筛选后的单词数
+const filteredWordCount = computed(() => {
+  let count = 0
+
+  // 计算来源数量
+  if (settings.source === 'all') {
+    count = sourceCounts['汇总'] + sourceCounts['RAZ分级']
+  } else if (settings.source === '汇总') {
+    count = sourceCounts['汇总']
+  } else {
+    // RAZ分级
+    if (settings.razLevels.length > 0) {
+      count = selectedRazWordCount.value
+    } else {
+      count = sourceCounts['RAZ分级']
+    }
   }
-  return counts[level] || 0
+
+  // 如果选择了年级，估算比例
+  if (settings.gradeLevels.length > 0) {
+    const totalGrade = gradeLevels.reduce((sum, g) => sum + g.count, 0)
+    const selectedGrade = gradeLevels
+      .filter(g => settings.gradeLevels.includes(g.value))
+      .reduce((sum, g) => sum + g.count, 0)
+    count = Math.round(count * selectedGrade / totalGrade)
+  }
+
+  return count
+})
+
+// 切换RAZ级别
+const toggleLevel = (level: string) => {
+  const index = settings.razLevels.indexOf(level)
+  if (index > -1) {
+    settings.razLevels.splice(index, 1)
+  } else {
+    settings.razLevels.push(level)
+  }
+}
+
+// 切换年级
+const toggleGrade = (grade: string) => {
+  const index = settings.gradeLevels.indexOf(grade)
+  if (index > -1) {
+    settings.gradeLevels.splice(index, 1)
+  } else {
+    settings.gradeLevels.push(grade)
+  }
+}
+
+const updateWordCount = () => {
+  // 切换来源时重置级别选择
+  if (settings.source === '汇总') {
+    settings.razLevels = []
+  }
 }
 
 onMounted(async () => {
