@@ -28,11 +28,17 @@ export const useWordStore = defineStore('word', {
   },
 
   actions: {
-    async fetchWords(page = 1, category?: string) {
+    async fetchWords(page = 1, category?: string, filters?: { source?: string; razLevel?: string; gradeLevel?: string }) {
       this.loading = true
       this.error = null
       try {
-        const response = await wordApi.getAll({ page, limit: this.limit, category })
+        const params: any = { page, limit: this.limit }
+        if (category) params.category = category
+        if (filters?.source) params.source = filters.source
+        if (filters?.razLevel) params.razLevel = filters.razLevel
+        if (filters?.gradeLevel) params.gradeLevel = filters.gradeLevel
+
+        const response = await wordApi.getAll(params)
         if (response.success && response.data) {
           // API returns { success, data: Word[], pagination }
           // The axios interceptor already extracts response.data
