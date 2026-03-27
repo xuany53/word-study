@@ -154,6 +154,7 @@ const wordStore = useWordStore()
 const authStore = useAuthStore()
 
 const mode = ref<'choice' | 'spelling'>('choice')
+const questionType = ref<'word-to-meaning' | 'meaning-to-word'>('word-to-meaning')
 const options = ref<string[]>([])
 const selectedOption = ref<string | null>(null)
 const userAnswer = ref('')
