@@ -46,6 +46,14 @@ coverage/
 # Database
 *.sql.backup
 
+# Data files (raw data not included in repo)
+*.xlsx
+*.xls
+*.csv
+
 # Claude Code
 .claude/
 .gstack/
+
+# Docs drafts
+docs/drafts/
