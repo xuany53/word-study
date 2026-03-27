@@ -38,6 +38,9 @@ export class Word {
   @Column({ type: 'varchar', nullable: true })
   category: string
 
+  @Column({ type: 'varchar', nullable: true })
+  gradeLevel: string // 小学/初中/高中
+
   @Column({ type: 'int', default: 1 })
   difficulty: number
 
