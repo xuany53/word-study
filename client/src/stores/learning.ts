@@ -55,11 +55,11 @@ export const useLearningStore = defineStore('learning', {
   },
 
   actions: {
-    async fetchTodayWords(category?: string) {
+    async fetchTodayWords(filters?: { category?: string; source?: string; razLevel?: string; gradeLevel?: string }) {
       this.loading = true
       this.error = null
       try {
-        const response = await learningApi.getTodayWords(category)
+        const response = await learningApi.getTodayWords(filters)
         if (response.success && response.data) {
           const data = response.data as any
           this.todayWords = {
