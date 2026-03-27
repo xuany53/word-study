@@ -19,7 +19,9 @@ export class AuthController {
       if (existingUser) {
         res.status(400).json({
           success: false,
-          message: 'Username or email already exists'
+          message: existingUser.username === username
+            ? '该用户名已被注册'
+            : '该邮箱已被注册'
         })
         return
       }
