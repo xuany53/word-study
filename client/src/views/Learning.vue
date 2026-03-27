@@ -307,6 +307,13 @@ const checkAnswer = async () => {
 const submitAndShowFeedback = async (isCorrect: boolean) => {
   if (!currentWord.value) return
 
+  // 播放提示音
+  if (isCorrect) {
+    audioService.playCorrectSound()
+  } else {
+    audioService.playWrongSound()
+  }
+
   try {
     const response = await learningStore.submitAnswer(currentWord.value.id, isCorrect)
 

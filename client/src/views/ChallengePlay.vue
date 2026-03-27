@@ -135,6 +135,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChallengeStore, useWordStore, useAuthStore } from '@/stores'
+import audioService from '@/services/audioService'
 import type { Word } from '@/types/word'
 
 const route = useRoute()
@@ -333,6 +334,13 @@ async function selectOption(option: string) {
     correctAnswer = currentWord.value?.meaning ||
       (currentWord.value as any)?.meanings?.[0]?.translation || ''
     isCorrect = option === correctAnswer
+  }
+
+  // 播放提示音
+  if (isCorrect) {
+    audioService.playCorrectSound()
+  } else {
+    audioService.playWrongSound()
   }
 
   // Show feedback

@@ -251,10 +251,70 @@ if ('speechSynthesis' in window) {
   speechSynthesis.getVoices()
 }
 
+/**
+ * 播放正确提示音 (上升音调)
+ */
+export function playCorrectSound(): void {
+  try {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+    const oscillator = audioContext.createOscillator()
+    const gainNode = audioContext.createGain()
+
+    oscillator.connect(gainNode)
+    gainNode.connect(audioContext.destination)
+
+    // 上升音调：从 523Hz (C5) 到 784Hz (G5)
+    oscillator.frequency.setValueAtTime(523, audioContext.currentTime)
+    oscillator.frequency.exponentialRampToValueAtTime(784, audioContext.currentTime + 0.15)
+
+    oscillator.type = 'sine'
+
+    // 音量淡出
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2)
+
+    oscillator.start(audioContext.currentTime)
+    oscillator.stop(audioContext.currentTime + 0.2)
+  } catch (error) {
+    console.error('Play correct sound error:', error)
+  }
+}
+
+/**
+ * 播放错误提示音 (下降音调)
+ */
+export function playWrongSound(): void {
+  try {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+    const oscillator = audioContext.createOscillator()
+    const gainNode = audioContext.createGain()
+
+    oscillator.connect(gainNode)
+    gainNode.connect(audioContext.destination)
+
+    // 下降音调：从 392Hz (G4) 到 262Hz (C4)
+    oscillator.frequency.setValueAtTime(392, audioContext.currentTime)
+    oscillator.frequency.exponentialRampToValueAtTime(262, audioContext.currentTime + 0.25)
+
+    oscillator.type = 'sawtooth'
+
+    // 音量淡出
+    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime)
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
+
+    oscillator.start(audioContext.currentTime)
+    oscillator.stop(audioContext.currentTime + 0.3)
+  } catch (error) {
+    console.error('Play wrong sound error:', error)
+  }
+}
+
 export default {
   playWordAudio,
   stopCurrentAudio,
   preloadWordAudio,
   preloadWordsAudio,
-  isAudioAvailable
+  isAudioAvailable,
+  playCorrectSound,
+  playWrongSound
 }
