@@ -74,7 +74,7 @@ export class AuthController {
       if (!user) {
         res.status(401).json({
           success: false,
-          message: 'Invalid credentials'
+          message: '邮箱或密码错误'
         })
         return
       }
@@ -84,7 +84,7 @@ export class AuthController {
       if (!isPasswordValid) {
         res.status(401).json({
           success: false,
-          message: 'Invalid credentials'
+          message: '邮箱或密码错误'
         })
         return
       }
