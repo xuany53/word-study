@@ -344,7 +344,7 @@ const selectOption = async (option: string) => {
   selectedOption.value = option
   answered.value = true
 
-  const isCorrect = option === currentWord.value.word
+  const isCorrect = isCorrectOption(option)
   await submitAndShowFeedback(isCorrect)
 }
 
