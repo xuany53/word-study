@@ -256,10 +256,13 @@ onMounted(async () => {
   }
 })
 
-watch(currentWord, () => {
+watch(currentWord, async () => {
   if (currentWord.value && isInitialized.value) {
     generateOptions()
     resetState()
+    // 自动播放新单词的读音
+    await nextTick()
+    playAudio()
   }
 })
 
