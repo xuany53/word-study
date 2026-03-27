@@ -197,14 +197,6 @@ onMounted(async () => {
     return
   }
 
-  // 预加载语音列表
-  if ('speechSynthesis' in window) {
-    speechSynthesis.getVoices()
-    speechSynthesis.addEventListener('voiceschanged', () => {
-      speechSynthesis.getVoices()
-    })
-  }
-
   try {
     // 检查是否有主题参数
     const themeParam = route.query.theme as string | undefined
