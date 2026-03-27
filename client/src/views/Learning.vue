@@ -183,6 +183,7 @@ const lastCorrectAnswer = ref('')
 
 // Audio state
 const isPlayingAudio = ref(false)
+const isPlayingExample = ref(false)
 
 const currentWord = computed(() => learningStore.currentWord)
 const progress = computed(() => learningStore.progress)
