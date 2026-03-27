@@ -5,11 +5,15 @@
 
 // 在线TTS服务配置
 const TTS_SERVICES = {
-  // Google Translate TTS (免费)
-  google: (word: string) =>
-    `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=en&client=tw-ob`,
+  // 有道词典 TTS (国内可用)
+  youdao: (word: string) =>
+    `https://dict.youdao.com/dictvoice?type=1&audio=${encodeURIComponent(word)}`,
 
-  // ResponsiveVoice API (需要API key，这里用免费模式)
+  // 百度词典 TTS (国内可用)
+  baidu: (word: string) =>
+    `https://fanyi.baidu.com/tts?tex=${encodeURIComponent(word)}&c=en&lan=en`,
+
+  // ResponsiveVoice API
   responsivevoice: (word: string) =>
     `https://code.responsivevoice.org/getvoice.php?t=${encodeURIComponent(word)}&tl=en-US`,
 
@@ -47,16 +51,16 @@ export async function playWordAudio(word: string, pronunciationUrl?: string): Pr
       return true
     }
 
-    // 3. 尝试使用在线TTS服务
-    const ttsUrl = TTS_SERVICES.google(word)
-    const success = await playAudioUrl(ttsUrl)
+    // 3. 尝试使用在线TTS服务 (优先使用国内可用的服务)
+    // 有道词典 TTS
+    let ttsUrl = TTS_SERVICES.youdao(word)
+    let success = await playAudioUrl(ttsUrl, 3000)
     if (success) {
-      // 缓存成功的音频
       cacheAudio(word, ttsUrl)
       return true
     }
 
-    // 4. 最后使用 Web Speech API
+    // 4. 使用 Web Speech API (最可靠的fallback)
     return await playWithWebSpeech(word)
   } catch (error) {
     console.error('Audio playback error:', error)
@@ -68,24 +72,53 @@ export async function playWordAudio(word: string, pronunciationUrl?: string): Pr
 /**
  * 播放音频URL
  */
-async function playAudioUrl(url: string): Promise<boolean> {
+async function playAudioUrl(url: string, timeout: number = 5000): Promise<boolean> {
   return new Promise((resolve) => {
     const audio = new Audio(url)
+    // 注意：不要设置 crossOrigin，有道词典 TTS 不支持 CORS
 
-    audio.oncanplaythrough = async () => {
-      try {
-        await audio.play()
-        currentAudio = audio
-        resolve(true)
-      } catch {
+    let resolved = false
+    const cleanup = () => {
+      if (!resolved) {
+        resolved = true
+        clearTimeout(timeoutId)
         resolve(false)
       }
     }
 
-    audio.onerror = () => resolve(false)
+    const timeoutId = setTimeout(() => {
+      audio.pause()
+      cleanup()
+    }, timeout)
 
-    // 设置超时
-    setTimeout(() => resolve(false), 5000)
+    audio.oncanplaythrough = async () => {
+      if (resolved) return
+      try {
+        await audio.play()
+        currentAudio = audio
+        resolved = true
+        clearTimeout(timeoutId)
+        resolve(true)
+      } catch {
+        cleanup()
+      }
+    }
+
+    // 添加 loadeddata 事件作为备用
+    audio.onloadeddata = async () => {
+      if (resolved) return
+      try {
+        await audio.play()
+        currentAudio = audio
+        resolved = true
+        clearTimeout(timeoutId)
+        resolve(true)
+      } catch {
+        // 继续等待 oncanplaythrough
+      }
+    }
+
+    audio.onerror = cleanup
 
     // 开始加载
     audio.load()
