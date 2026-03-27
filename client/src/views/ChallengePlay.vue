@@ -263,29 +263,57 @@ function stopTimer() {
 function generateOptions() {
   if (!currentWord.value) return
 
+  // 40% 概率是中文→英文题型
+  questionType.value = Math.random() < 0.4 ? 'meaning-to-word' : 'word-to-meaning'
+
   const allWords = wordStore.words
-  // Get meaning from either 'meaning' field or 'meanings' array
-  const correctMeaning = currentWord.value.meaning ||
-    (currentWord.value as any).meanings?.[0]?.translation || ''
 
-  // Get other meanings for wrong options
-  const otherMeanings = allWords
-    .filter(w => w.id !== currentWord.value?.id)
-    .map(w => (w as any).meaning || (w as any).meanings?.[0]?.translation || '')
-    .filter(m => m && m !== correctMeaning)
+  if (questionType.value === 'meaning-to-word') {
+    // 中文→英文 题型：选项是英文单词
+    const correctWord = currentWord.value.word
 
-  // Shuffle and take 3 wrong options
-  const shuffled = otherMeanings.sort(() => Math.random() - 0.5)
-  const wrongOptions = shuffled.slice(0, 3)
+    // 获取其他单词作为错误选项
+    const otherWords = allWords
+      .filter(w => w.id !== currentWord.value?.id)
+      .map(w => w.word)
+      .filter(w => w && w !== correctWord)
 
-  // If not enough wrong options, add some placeholders
-  while (wrongOptions.length < 3) {
-    wrongOptions.push(`选项${wrongOptions.length + 1}`)
+    // 随机选3个错误选项
+    const shuffled = otherWords.sort(() => Math.random() - 0.5)
+    const wrongOptions = shuffled.slice(0, 3)
+
+    // 如果不够3个，添加占位符
+    while (wrongOptions.length < 3) {
+      wrongOptions.push(`word${wrongOptions.length + 1}`)
+    }
+
+    // 合并并打乱
+    const allOptions = [correctWord, ...wrongOptions]
+    options.value = allOptions.sort(() => Math.random() - 0.5)
+  } else {
+    // 英文→中文 题型：选项是中文释义（原有逻辑）
+    const correctMeaning = currentWord.value.meaning ||
+      (currentWord.value as any).meanings?.[0]?.translation || ''
+
+    // Get other meanings for wrong options
+    const otherMeanings = allWords
+      .filter(w => w.id !== currentWord.value?.id)
+      .map(w => (w as any).meaning || (w as any).meanings?.[0]?.translation || '')
+      .filter(m => m && m !== correctMeaning)
+
+    // Shuffle and take 3 wrong options
+    const shuffled = otherMeanings.sort(() => Math.random() - 0.5)
+    const wrongOptions = shuffled.slice(0, 3)
+
+    // If not enough wrong options, add some placeholders
+    while (wrongOptions.length < 3) {
+      wrongOptions.push(`选项${wrongOptions.length + 1}`)
+    }
+
+    // Combine and shuffle
+    const allOptions = [correctMeaning, ...wrongOptions]
+    options.value = allOptions.sort(() => Math.random() - 0.5)
   }
-
-  // Combine and shuffle
-  const allOptions = [correctMeaning, ...wrongOptions]
-  options.value = allOptions.sort(() => Math.random() - 0.5)
 }
 
 async function selectOption(option: string) {
