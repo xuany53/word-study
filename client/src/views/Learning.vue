@@ -22,19 +22,35 @@
 
       <!-- 单词卡片 -->
       <div v-if="currentWord" class="word-card card">
-        <div class="word-header">
-          <span class="word-text">{{ currentWord.word }}</span>
-          <button
-            class="audio-btn"
-            :class="{ playing: isPlayingAudio }"
-            @click="playAudio"
-            :disabled="isPlayingAudio"
-            title="播放发音"
-          >
-            {{ isPlayingAudio ? '🔈' : '🔊' }}
-          </button>
+        <!-- 题型指示器 -->
+        <div class="question-type-indicator">
+          {{ questionType === 'word-to-meaning' ? '📝 英文→中文' : '🔤 中文→英文' }}
         </div>
-        <div class="phonetic">{{ currentWord.phonetic }}</div>
+
+        <!-- 英文→中文 题型 -->
+        <template v-if="questionType === 'word-to-meaning'">
+          <div class="word-header">
+            <span class="word-text">{{ currentWord.word }}</span>
+            <button
+              class="audio-btn"
+              :class="{ playing: isPlayingAudio }"
+              @click="playAudio"
+              :disabled="isPlayingAudio"
+              title="播放发音"
+            >
+              {{ isPlayingAudio ? '🔈' : '🔊' }}
+            </button>
+          </div>
+          <div class="phonetic">{{ currentWord.phonetic }}</div>
+        </template>
+
+        <!-- 中文→英文 题型 -->
+        <template v-else>
+          <div class="meaning-question">
+            {{ currentWord.meanings?.[0]?.translation || currentWord.meanings?.[0]?.definition || '' }}
+          </div>
+          <div class="hint-text">请选择正确的英文单词</div>
+        </template>
 
         <!-- 选择题模式 -->
         <div v-if="mode === 'choice'" class="options">
@@ -43,8 +59,8 @@
             :key="index"
             class="option-btn"
             :class="{
-              correct: answered && option === currentWord.word,
-              wrong: answered && selectedOption === option && option !== currentWord.word
+              correct: answered && isCorrectOption(option),
+              wrong: answered && selectedOption === option && !isCorrectOption(option)
             }"
             :disabled="answered"
             @click="selectOption(option)"
