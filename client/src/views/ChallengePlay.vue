@@ -75,7 +75,7 @@
           <span class="feedback-icon">{{ feedbackType === 'correct' ? '✓' : '✗' }}</span>
           <span class="feedback-text">{{ feedbackType === 'correct' ? '正确!' : '错误!' }}</span>
           <p v-if="feedbackType === 'wrong'" class="correct-answer">
-            正确答案: {{ currentWord?.meaning }}
+            正确答案: {{ questionType === 'meaning-to-word' ? currentWord?.word : (currentWord?.meaning || (currentWord as any)?.meanings?.[0]?.translation) }}
           </p>
         </div>
       </div>
