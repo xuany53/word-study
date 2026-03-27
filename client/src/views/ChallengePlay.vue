@@ -544,10 +544,31 @@ function goHome() {
   color: #1a1a2e;
 }
 
+.word.meaning-display {
+  font-size: 28px;
+  line-height: 1.4;
+}
+
 .phonetic {
   font-size: 18px;
   color: #666;
   margin-bottom: 32px;
+}
+
+.phonetic.hint-text {
+  font-size: 14px;
+  color: #999;
+}
+
+.question-type-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 16px;
 }
 
 .options {
