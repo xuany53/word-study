@@ -44,26 +44,7 @@
 
 ## 📸 项目截图
 
-<p align="center">
-  <table>
-    <tr>
-      <td align="center"><b>首页</b></td>
-      <td align="center"><b>学习页面</b></td>
-    </tr>
-    <tr>
-      <td><img src="docs/screenshots/home.png" width="300"></td>
-      <td><img src="docs/screenshots/learning.png" width="300"></td>
-    </tr>
-    <tr>
-      <td align="center"><b>闯关模式</b></td>
-      <td align="center"><b>学习统计</b></td>
-    </tr>
-    <tr>
-      <td><img src="docs/screenshots/challenge.png" width="300"></td>
-      <td><img src="docs/screenshots/stats.png" width="300"></td>
-    </tr>
-  </table>
-</p>
+<img width="1328" height="879" alt="image" src="https://github.com/user-attachments/assets/4e5dc63a-02f6-45c6-84f9-74d729dc5c8a" />
 
 ---
 
