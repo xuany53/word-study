@@ -320,10 +320,20 @@ async function selectOption(option: string) {
   if (selectedOption.value !== null) return
 
   selectedOption.value = option
-  // Get meaning from either 'meaning' field or 'meanings' array
-  const correctMeaning = currentWord.value?.meaning ||
-    (currentWord.value as any)?.meanings?.[0]?.translation || ''
-  const isCorrect = option === correctMeaning
+
+  let isCorrect: boolean
+  let correctAnswer: string
+
+  if (questionType.value === 'meaning-to-word') {
+    // 中文→英文 题型：正确答案是英文单词
+    correctAnswer = currentWord.value?.word || ''
+    isCorrect = option === correctAnswer
+  } else {
+    // 英文→中文 题型：正确答案是中文释义
+    correctAnswer = currentWord.value?.meaning ||
+      (currentWord.value as any)?.meanings?.[0]?.translation || ''
+    isCorrect = option === correctAnswer
+  }
 
   // Show feedback
   feedbackType.value = isCorrect ? 'correct' : 'wrong'
