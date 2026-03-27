@@ -411,6 +411,12 @@ watch(() => settings.theme, (newTheme) => {
   border-bottom: none;
 }
 
+.setting-item.vertical {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
 .setting-item label {
   color: var(--text-primary);
   font-weight: 500;
@@ -429,6 +435,111 @@ watch(() => settings.theme, (newTheme) => {
   border-radius: 12px;
   font-size: 14px;
   font-weight: bold;
+}
+
+/* RAZ级别网格 */
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.level-btn {
+  padding: 8px 4px;
+  border: 2px solid var(--bg-dark);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all var(--transition-fast);
+  color: var(--text-primary);
+}
+
+.level-btn:hover {
+  border-color: var(--primary-color);
+}
+
+.level-btn.active {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+/* 年级网格 */
+.grade-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.grade-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 12px;
+  border: 2px solid var(--bg-dark);
+  border-radius: 12px;
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.grade-btn:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+.grade-btn.active {
+  background: var(--primary-light);
+  border-color: var(--primary-color);
+}
+
+.grade-icon {
+  font-size: 24px;
+}
+
+.grade-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.grade-count {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.selected-count {
+  color: var(--primary-color);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 筛选统计 */
+.filter-summary {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--primary-light);
+  border-radius: 12px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary-label {
+  color: var(--text-secondary);
+}
+
+.summary-value {
+  font-weight: bold;
+  color: var(--primary-color);
+  font-size: 18px;
 }
 
 .level-select {
