@@ -75,21 +75,99 @@ export class ChallengeController {
 
   /**
    * Get all challenge levels with user's progress
+   * 动态生成关卡：每个难度等级最多显示3关待挑战
    */
   getAllLevels = async (req: Request, res: Response): Promise<void> => {
     try {
       const userId = (req as any).userId
 
-      // Get all levels
-      const levels = await this.levelRepository.find({
+      // Get existing levels
+      const existingLevels = await this.levelRepository.find({
         order: { difficulty: 'ASC', createdAt: 'ASC' }
       })
 
-      // Get user's results for each level
+      // Get user's results
       const results = await this.resultRepository.find({
         where: { userId },
         order: { completedAt: 'DESC' }
       })
+
+      // Count passed levels per difficulty
+      const passedPerDifficulty: Record<string, number> = {}
+      for (const result of results) {
+        if (result.isPassed) {
+          const level = existingLevels.find(l => l.id === result.levelId)
+          if (level) {
+            passedPerDifficulty[level.difficulty] = (passedPerDifficulty[level.difficulty] || 0) + 1
+          }
+        }
+      }
+
+      // Check if we need to generate more levels
+      const levelsToAdd: ChallengeLevel[] = []
+      for (const difficulty of DIFFICULTY_ORDER) {
+        const template = LEVEL_TEMPLATES[difficulty]
+        const existingCount = existingLevels.filter(l => l.difficulty === difficulty).length
+        const passedCount = passedPerDifficulty[difficulty] || 0
+
+        // 生成新关卡的条件：
+        // 1. 该难度至少有3关可玩
+        // 2. 用户通关的关卡数 >= 现有关卡数 - 1 时，生成新关卡
+        const minLevelsPerDifficulty = 3
+        const neededLevels = Math.max(minLevelsPerDifficulty, passedCount + 2) - existingCount
+
+        if (neededLevels > 0) {
+          for (let i = 0; i < neededLevels; i++) {
+            const levelNumber = existingCount + i + 1
+            const newLevel = this.levelRepository.create({
+              name: `${template.namePrefix} #${levelNumber}`,
+              description: this.getLevelDescription(difficulty, levelNumber),
+              wordCount: template.wordCount,
+              timeLimit: template.timeLimit,
+              maxErrors: template.maxErrors,
+              difficulty: template.difficulty,
+              xpReward: template.xpReward + Math.floor(levelNumber / 3) * 5, // 每3关奖励增加
+              prerequisiteLevelId: null // 将在后面设置
+            })
+            levelsToAdd.push(newLevel)
+          }
+        }
+      }
+
+      // Save new levels
+      if (levelsToAdd.length > 0) {
+        await this.levelRepository.save(levelsToAdd)
+        // 重新获取所有关卡
+        const allLevels = await this.levelRepository.find({
+          order: { difficulty: 'ASC', createdAt: 'ASC' }
+        })
+
+        // 设置前置关卡（同一难度的前一关）
+        for (let i = 0; i < allLevels.length; i++) {
+          const level = allLevels[i]
+          // 找到同一难度的前一关
+          for (let j = i - 1; j >= 0; j--) {
+            if (allLevels[j].difficulty === level.difficulty) {
+              if (level.prerequisiteLevelId !== allLevels[j].id) {
+                level.prerequisiteLevelId = allLevels[j].id
+                await this.levelRepository.save(level)
+              }
+              break
+            }
+          }
+        }
+
+        existingLevels.length = 0
+        existingLevels.push(...allLevels)
+      }
+
+      // Build levels with status
+      const passedLevelIds = new Set<string>()
+      for (const result of results) {
+        if (result.isPassed) {
+          passedLevelIds.add(result.levelId)
+        }
+      }
 
       // Create a map of levelId -> best result
       const bestResults = new Map<string, ChallengeResult>()
@@ -100,21 +178,12 @@ export class ChallengeController {
         }
       }
 
-      // Create a set of passed level IDs
-      const passedLevelIds = new Set<string>()
-      for (const result of results) {
-        if (result.isPassed) {
-          passedLevelIds.add(result.levelId)
-        }
-      }
-
-      // Build levels with status
-      const levelsWithStatus = levels.map((level, index) => {
+      const levelsWithStatus = existingLevels.map((level, index) => {
         const bestResult = bestResults.get(level.id)
-        // Unlock: first level always unlocked, or prerequisite level has been passed
-        const isUnlocked = index === 0 ||
-          !level.prerequisiteLevelId ||
-          passedLevelIds.has(level.prerequisiteLevelId)
+        // Unlock: first level of each difficulty always unlocked, or prerequisite level has been passed
+        const isFirstOfDifficulty = !level.prerequisiteLevelId ||
+          !existingLevels.some(l => l.difficulty === level.difficulty && l.prerequisiteLevelId === level.id)
+        const isUnlocked = isFirstOfDifficulty || passedLevelIds.has(level.prerequisiteLevelId || '')
 
         return {
           ...level,
@@ -136,6 +205,20 @@ export class ChallengeController {
         message: 'Internal server error'
       })
     }
+  }
+
+  /**
+   * Get level description based on difficulty
+   */
+  private getLevelDescription(difficulty: string, levelNumber: number): string {
+    const descriptions: Record<string, string> = {
+      easy: '无时间限制，轻松入门',
+      medium: '限时挑战，测试速度',
+      hard: '零失误要求，追求完美',
+      expert: '高难度单词，终极考验',
+      legendary: '传奇级别，挑战极限'
+    }
+    return `${descriptions[difficulty] || '挑战自我'} - 第${levelNumber}关`
   }
 
   /**
