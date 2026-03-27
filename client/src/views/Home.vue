@@ -3,7 +3,7 @@
     <div class="container">
       <!-- 头部欢迎 -->
       <header class="header">
-        <h1>单词学习</h1>
+        <h1>趣背词-单词学习</h1>
         <p class="subtitle">让背单词不再枯燥！</p>
       </header>
 

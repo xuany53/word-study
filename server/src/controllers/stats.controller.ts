@@ -37,7 +37,8 @@ export class StatsController {
           longestStreak: user.longestStreak,
           totalWords: records.length,
           masteredWords: masteredCount,
-          correctRate: Math.round(correctRate * 10) / 10
+          correctRate: Math.round(correctRate * 10) / 10,
+          lastCheckIn: user.lastCheckIn
         }
       })
     } catch (error) {

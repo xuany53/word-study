@@ -68,12 +68,12 @@
           <button
             class="btn btn-primary"
             @click="handleCheckIn"
-            :disabled="checkInLoading || !canCheckIn"
-            :title="!canCheckIn ? checkInReason : ''"
+            :disabled="checkInLoading || hasCheckedIn || !canCheckIn"
+            :title="checkInButtonTitle"
           >
-            {{ checkInLoading ? '打卡中...' : '今日打卡' }}
+            {{ checkInButtonText }}
           </button>
-          <p v-if="!canCheckIn" class="checkin-hint">{{ checkInReason }}</p>
+          <p v-if="checkInHint" class="checkin-hint">{{ checkInHint }}</p>
         </div>
       </template>
     </div>
@@ -89,6 +89,7 @@ const authStore = useAuthStore()
 
 const loading = ref(true)
 const checkInLoading = ref(false)
+const hasCheckedIn = ref(false) // 今日是否已打卡
 
 const todayStats = reactive({
   newWords: 0,
@@ -102,7 +103,8 @@ const userStats = reactive({
   correctRate: 0,
   totalDays: 0,
   streak: 0,
-  longestStreak: 0
+  longestStreak: 0,
+  lastCheckIn: null as Date | null
 })
 
 // 每日学习目标
@@ -118,18 +120,49 @@ const dailyGoal = computed(() => {
 // 今日已学单词数
 const todayLearnedWords = computed(() => todayStats.newWords + todayStats.review)
 
-// 是否可以手动打卡
-const canCheckIn = computed(() => {
+// 是否达到打卡条件
+const hasReachedGoal = computed(() => {
   return todayLearnedWords.value >= dailyGoal.value
 })
 
-// 不能打卡的原因
-const checkInReason = computed(() => {
-  if (todayLearnedWords.value === 0) {
-    return `今日尚未学习，需完成 ${dailyGoal.value} 个单词才能打卡`
-  }
-  return `今日已学 ${todayLearnedWords.value} 个单词，需完成 ${dailyGoal.value} 个才能打卡`
+// 是否可以手动打卡（未打卡且达到目标）
+const canCheckIn = computed(() => {
+  return !hasCheckedIn.value && hasReachedGoal.value
 })
+
+// 打卡按钮文字
+const checkInButtonText = computed(() => {
+  if (checkInLoading.value) return '打卡中...'
+  if (hasCheckedIn.value) return '今日已打卡'
+  return '今日打卡'
+})
+
+// 打卡按钮提示
+const checkInButtonTitle = computed(() => {
+  if (hasCheckedIn.value) return '今日已打卡'
+  if (!hasReachedGoal.value) return '请完成今日学习任务'
+  return ''
+})
+
+// 打卡提示信息
+const checkInHint = computed(() => {
+  if (hasCheckedIn.value) return ''
+  if (!hasReachedGoal.value) return '请完成今日学习任务'
+  return ''
+})
+
+// 检查是否今天已打卡
+const checkIfCheckedInToday = (lastCheckIn: Date | null) => {
+  if (!lastCheckIn) return false
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const checkInDate = new Date(lastCheckIn)
+  checkInDate.setHours(0, 0, 0, 0)
+
+  return checkInDate.getTime() === today.getTime()
+}
 
 onMounted(async () => {
   await statsStore.fetchStats()
@@ -137,6 +170,11 @@ onMounted(async () => {
 
   if (statsStore.userStats) {
     Object.assign(userStats, statsStore.userStats)
+
+    // 检查今天是否已打卡
+    if (userStats.lastCheckIn) {
+      hasCheckedIn.value = checkIfCheckedInToday(new Date(userStats.lastCheckIn))
+    }
   }
 
   if (statsStore.dailyStats) {
@@ -153,7 +191,12 @@ const handleCheckIn = async () => {
   try {
     await statsStore.checkIn()
     userStats.streak = statsStore.streak
-  } catch (error) {
+    hasCheckedIn.value = true // 打卡成功
+  } catch (error: any) {
+    // 如果返回 "Already checked in today"，说明已打卡
+    if (error?.message?.includes('Already checked in')) {
+      hasCheckedIn.value = true
+    }
     console.error('Check in failed:', error)
   } finally {
     checkInLoading.value = false

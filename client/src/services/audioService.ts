@@ -252,11 +252,14 @@ if ('speechSynthesis' in window) {
 }
 
 /**
- * 播放正确提示音 (语音 "excellent")
+ * 播放正确提示音 (语音 "excellent" + 音调)
  */
 export function playCorrectSound(): void {
   try {
-    // 使用 Web Speech API 播放 "excellent" 语音
+    // 1. 播放音调（确保有声音反馈）
+    playCorrectTone()
+
+    // 2. 同时播放 "excellent" 语音
     if ('speechSynthesis' in window) {
       speechSynthesis.cancel() // 取消之前的播放
 
@@ -280,8 +283,6 @@ export function playCorrectSound(): void {
     }
   } catch (error) {
     console.error('Play correct sound error:', error)
-    // Fallback: 播放音调
-    playCorrectTone()
   }
 }
 
