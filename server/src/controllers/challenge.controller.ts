@@ -8,6 +8,52 @@ import { User } from '../entities/User'
 // In-memory challenge sessions (in production, use Redis)
 const challengeSessions = new Map<string, ChallengeSession>()
 
+// 关卡模板配置 - 5个难度等级，每个等级可生成无限关卡
+const LEVEL_TEMPLATES = {
+  easy: {
+    namePrefix: '新手训练',
+    wordCount: 5,
+    timeLimit: null,
+    maxErrors: 2,
+    xpReward: 10,
+    difficulty: 'easy'
+  },
+  medium: {
+    namePrefix: '速度挑战',
+    wordCount: 10,
+    timeLimit: 60,
+    maxErrors: 2,
+    xpReward: 20,
+    difficulty: 'medium'
+  },
+  hard: {
+    namePrefix: '完美挑战',
+    wordCount: 15,
+    timeLimit: 90,
+    maxErrors: 0,
+    xpReward: 35,
+    difficulty: 'hard'
+  },
+  expert: {
+    namePrefix: '终极挑战',
+    wordCount: 20,
+    timeLimit: 120,
+    maxErrors: 1,
+    xpReward: 50,
+    difficulty: 'expert'
+  },
+  legendary: {
+    namePrefix: '传奇挑战',
+    wordCount: 30,
+    timeLimit: 150,
+    maxErrors: 1,
+    xpReward: 80,
+    difficulty: 'legendary'
+  }
+}
+
+const DIFFICULTY_ORDER = ['easy', 'medium', 'hard', 'expert', 'legendary']
+
 interface ChallengeSession {
   id: string
   userId: string
