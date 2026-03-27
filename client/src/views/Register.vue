@@ -79,6 +79,18 @@ const loading = ref(false)
 const error = ref('')
 
 const handleRegister = async () => {
+  if (!form.value.username.trim()) {
+    error.value = '请输入用户名'
+    return
+  }
+  if (!form.value.email.trim()) {
+    error.value = '请输入邮箱'
+    return
+  }
+  if (form.value.password.length < 6) {
+    error.value = '密码至少需要6个字符'
+    return
+  }
   if (form.value.password !== form.value.confirmPassword) {
     error.value = '两次输入的密码不一致'
     return
@@ -90,7 +102,14 @@ const handleRegister = async () => {
     await authStore.register(form.value.username, form.value.email, form.value.password)
     router.push('/')
   } catch (err: any) {
-    error.value = err.message || '注册失败'
+    // 显示后端返回的具体错误信息
+    if (err.message) {
+      error.value = err.message
+    } else if (err.response?.data?.message) {
+      error.value = err.response.data.message
+    } else {
+      error.value = '注册失败，请稍后重试'
+    }
   } finally {
     loading.value = false
   }
