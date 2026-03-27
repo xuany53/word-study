@@ -188,13 +188,30 @@ onMounted(async () => {
     // 检查是否有主题参数
     const themeParam = route.query.theme as string | undefined
 
-    // 从设置中获取 RAZ 级别
+    // 从设置中获取筛选参数
     const savedSettings = localStorage.getItem('wordStudySettings')
     const settings = savedSettings ? JSON.parse(savedSettings) : {}
-    const razLevel = settings.razLevel || 'all'
 
-    // Fetch words first (needed for option generation) with RAZ level filter
-    await wordStore.fetchWords(1, razLevel === 'all' ? undefined : razLevel)
+    // 构建筛选参数
+    const filterParams: any = {}
+
+    // 数据来源
+    if (settings.source && settings.source !== 'all') {
+      filterParams.source = settings.source
+    }
+
+    // RAZ级别（多选）
+    if (settings.razLevels && settings.razLevels.length > 0) {
+      filterParams.razLevel = settings.razLevels.join(',')
+    }
+
+    // 年级（多选，暂时只支持单选）
+    if (settings.gradeLevels && settings.gradeLevels.length > 0) {
+      filterParams.gradeLevel = settings.gradeLevels[0]
+    }
+
+    // Fetch words first (needed for option generation)
+    await wordStore.fetchWords(1, undefined, filterParams)
     allWords.value = wordStore.words
 
     // 如果有主题参数，筛选主题单词
@@ -221,7 +238,7 @@ onMounted(async () => {
     }
 
     // 非主题模式：使用今日学习单词
-    await learningStore.fetchTodayWords(razLevel)
+    await learningStore.fetchTodayWords(filterParams)
 
     let words = [
       ...learningStore.todayWords.newWordList,
