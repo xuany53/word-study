@@ -8,6 +8,67 @@
 
 ---
 
+## 单词数据库
+
+### 数据统计（2026-03-27更新）
+
+| 分类 | 数量 |
+|------|------|
+| 汇总词汇 | 6,465 个 |
+| RAZ分级词汇 | 13,473 个 |
+| **总计** | **19,938 个** |
+
+### RAZ分级级别
+
+共29个级别：AA, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, Z1, Z2
+
+### 年级分类
+
+| 年级 | 数量 |
+|------|------|
+| 小学 | 1,946 个 |
+| 初中 | 3,027 个 |
+| 高中 | 3,510 个 |
+| 其他 | 4,222 个 |
+
+### 数据结构
+
+```typescript
+interface Word {
+  id: string
+  word: string
+  phonetic: string
+  pronunciation?: string
+  meanings: Array<{ partOfSpeech: string; definition: string; translation: string }>
+  examples: Array<{ sentence: string; translation: string }>
+  image?: string
+  category?: string
+  gradeLevel?: string  // 小学/初中/高中
+  source?: string      // 汇总/RAZ分级
+  razLevel?: string    // aa, a, b, c... z2
+  difficulty: number
+  createdAt: Date
+}
+```
+
+### API筛选示例
+
+```bash
+# 按RAZ级别筛选（支持多选）
+GET /api/words?razLevel=a,b,c
+
+# 按RAZ级别 + 年级筛选
+GET /api/words?razLevel=a,b,c&gradeLevel=初中
+
+# 按汇总 + 年级筛选
+GET /api/words?source=汇总&gradeLevel=初中
+
+# 按RAZ分级 + 年级筛选
+GET /api/words?source=RAZ分级&gradeLevel=小学
+```
+
+---
+
 ## 技术栈
 
 ### 核心框架
