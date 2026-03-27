@@ -365,6 +365,41 @@ const playAudio = async () => {
   }
 }
 
+const playExampleAudio = async () => {
+  if (!currentWord.value?.examples?.[0] || isPlayingExample.value) return
+
+  isPlayingExample.value = true
+
+  try {
+    // 使用 Web Speech API 朗读例句
+    if ('speechSynthesis' in window) {
+      speechSynthesis.cancel()
+      const utterance = new SpeechSynthesisUtterance(currentWord.value.examples[0].sentence)
+      utterance.lang = 'en-US'
+      utterance.rate = 0.9
+      utterance.pitch = 1
+
+      const voices = speechSynthesis.getVoices()
+      const englishVoice = voices.find(v => v.lang.startsWith('en'))
+      if (englishVoice) {
+        utterance.voice = englishVoice
+      }
+
+      utterance.onend = () => {
+        isPlayingExample.value = false
+      }
+      utterance.onerror = () => {
+        isPlayingExample.value = false
+      }
+
+      speechSynthesis.speak(utterance)
+    }
+  } catch (error) {
+    console.error('Example audio playback failed:', error)
+    isPlayingExample.value = false
+  }
+}
+
 const switchMode = (newMode: 'choice' | 'spelling') => {
   mode.value = newMode
   resetState()
