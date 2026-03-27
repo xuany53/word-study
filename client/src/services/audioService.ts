@@ -439,5 +439,6 @@ export default {
   preloadWordsAudio,
   isAudioAvailable,
   playCorrectSound,
-  playWrongSound
+  playWrongSound,
+  playSentenceAudio
 }
