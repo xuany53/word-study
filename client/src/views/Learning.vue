@@ -22,35 +22,19 @@
 
       <!-- 单词卡片 -->
       <div v-if="currentWord" class="word-card card">
-        <!-- 题型指示器 -->
-        <div class="question-type-indicator">
-          {{ questionType === 'word-to-meaning' ? '📝 英文→中文' : '🔤 中文→英文' }}
+        <div class="word-header">
+          <span class="word-text">{{ currentWord.word }}</span>
+          <button
+            class="audio-btn"
+            :class="{ playing: isPlayingAudio }"
+            @click="playAudio"
+            :disabled="isPlayingAudio"
+            title="播放发音"
+          >
+            {{ isPlayingAudio ? '🔈' : '🔊' }}
+          </button>
         </div>
-
-        <!-- 英文→中文 题型 -->
-        <template v-if="questionType === 'word-to-meaning'">
-          <div class="word-header">
-            <span class="word-text">{{ currentWord.word }}</span>
-            <button
-              class="audio-btn"
-              :class="{ playing: isPlayingAudio }"
-              @click="playAudio"
-              :disabled="isPlayingAudio"
-              title="播放发音"
-            >
-              {{ isPlayingAudio ? '🔈' : '🔊' }}
-            </button>
-          </div>
-          <div class="phonetic">{{ currentWord.phonetic }}</div>
-        </template>
-
-        <!-- 中文→英文 题型 -->
-        <template v-else>
-          <div class="meaning-question">
-            {{ currentWord.meanings?.[0]?.translation || currentWord.meanings?.[0]?.definition || '' }}
-          </div>
-          <div class="hint-text">请选择正确的英文单词</div>
-        </template>
+        <div class="phonetic">{{ currentWord.phonetic }}</div>
 
         <!-- 选择题模式 -->
         <div v-if="mode === 'choice'" class="options">
@@ -59,8 +43,8 @@
             :key="index"
             class="option-btn"
             :class="{
-              correct: answered && isCorrectOption(option),
-              wrong: answered && selectedOption === option && !isCorrectOption(option)
+              correct: answered && option === currentWord.word,
+              wrong: answered && selectedOption === option && option !== currentWord.word
             }"
             :disabled="answered"
             @click="selectOption(option)"
@@ -170,7 +154,6 @@ const wordStore = useWordStore()
 const authStore = useAuthStore()
 
 const mode = ref<'choice' | 'spelling'>('choice')
-const questionType = ref<'word-to-meaning' | 'meaning-to-word'>('word-to-meaning')
 const options = ref<string[]>([])
 const selectedOption = ref<string | null>(null)
 const userAnswer = ref('')
@@ -283,9 +266,6 @@ watch(currentWord, () => {
 const generateOptions = () => {
   if (!currentWord.value) return
 
-  // 40% 概率是中文→英文题型
-  questionType.value = Math.random() < 0.4 ? 'meaning-to-word' : 'word-to-meaning'
-
   // If allWords is empty, use the session words as fallback
   const wordPool = allWords.value.length > 0
     ? allWords.value
@@ -293,42 +273,7 @@ const generateOptions = () => {
 
   if (wordPool.length === 0) return
 
-  if (questionType.value === 'meaning-to-word') {
-    // 中文→英文 题型：选项是英文单词
-    options.value = wordService.generateOptions(currentWord.value, wordPool, 4)
-  } else {
-    // 英文→中文 题型：选项是中文释义
-    const correctMeaning = currentWord.value.meanings?.[0]?.translation || currentWord.value.meanings?.[0]?.definition || ''
-
-    // 获取其他单词的中文释义作为错误选项
-    const otherMeanings = wordPool
-      .filter((w: any) => w.id !== currentWord.value?.id)
-      .map((w: any) => w.meanings?.[0]?.translation || w.meanings?.[0]?.definition || '')
-      .filter((m: string) => m && m !== correctMeaning)
-
-    // 随机选3个错误选项
-    const shuffled = otherMeanings.sort(() => Math.random() - 0.5)
-    const wrongOptions = shuffled.slice(0, 3)
-
-    // 如果不够3个，添加占位符
-    while (wrongOptions.length < 3) {
-      wrongOptions.push(`选项${wrongOptions.length + 1}`)
-    }
-
-    // 合并并打乱
-    const allOptions = [correctMeaning, ...wrongOptions]
-    options.value = allOptions.sort(() => Math.random() - 0.5)
-  }
-}
-
-// 判断选项是否正确
-const isCorrectOption = (option: string) => {
-  if (questionType.value === 'meaning-to-word') {
-    return option === currentWord.value?.word
-  } else {
-    const correctMeaning = currentWord.value?.meanings?.[0]?.translation || currentWord.value?.meanings?.[0]?.definition || ''
-    return option === correctMeaning
-  }
+  options.value = wordService.generateOptions(currentWord.value, wordPool, 4)
 }
 
 const resetState = () => {
@@ -344,7 +289,7 @@ const selectOption = async (option: string) => {
   selectedOption.value = option
   answered.value = true
 
-  const isCorrect = isCorrectOption(option)
+  const isCorrect = option === currentWord.value.word
   await submitAndShowFeedback(isCorrect)
 }
 
@@ -489,31 +434,6 @@ const nextWord = () => {
 .word-card {
   padding: 32px;
   text-align: center;
-  margin-bottom: 24px;
-}
-
-.question-type-indicator {
-  display: inline-block;
-  padding: 6px 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  margin-bottom: 16px;
-}
-
-.meaning-question {
-  font-size: 28px;
-  font-weight: bold;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
-
-.hint-text {
-  font-size: 14px;
-  color: var(--text-secondary);
   margin-bottom: 24px;
 }
 
