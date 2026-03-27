@@ -140,7 +140,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useLearningStore, useWordStore, useAuthStore } from '@/stores'
+import { useLearningStore, useWordStore, useAuthStore, useStatsStore } from '@/stores'
 import { wordService } from '@/services/wordService'
 import audioService from '@/services/audioService'
 import FeedbackAnimation from '@/components/learning/FeedbackAnimation.vue'
@@ -152,6 +152,7 @@ const route = useRoute()
 const learningStore = useLearningStore()
 const wordStore = useWordStore()
 const authStore = useAuthStore()
+const statsStore = useStatsStore()
 
 const mode = ref<'choice' | 'spelling'>('choice')
 const options = ref<string[]>([])
@@ -357,8 +358,15 @@ const switchMode = (newMode: 'choice' | 'spelling') => {
   resetState()
 }
 
-const nextWord = () => {
+const nextWord = async () => {
   if (isLastWord.value) {
+    // 完成学习，自动打卡
+    try {
+      await statsStore.checkIn()
+    } catch (error) {
+      console.error('自动打卡失败:', error)
+    }
+
     learningStore.endSession()
     router.push('/stats')
     return
