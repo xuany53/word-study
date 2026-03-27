@@ -368,32 +368,73 @@ const playAudio = async () => {
 const playExampleAudio = async () => {
   if (!currentWord.value?.examples?.[0] || isPlayingExample.value) return
 
+  const sentence = currentWord.value.examples[0].sentence
+  if (!sentence) return
+
   isPlayingExample.value = true
 
   try {
     // 使用 Web Speech API 朗读例句
-    if ('speechSynthesis' in window) {
-      speechSynthesis.cancel()
-      const utterance = new SpeechSynthesisUtterance(currentWord.value.examples[0].sentence)
-      utterance.lang = 'en-US'
-      utterance.rate = 0.9
-      utterance.pitch = 1
-
-      const voices = speechSynthesis.getVoices()
-      const englishVoice = voices.find(v => v.lang.startsWith('en'))
-      if (englishVoice) {
-        utterance.voice = englishVoice
-      }
-
-      utterance.onend = () => {
-        isPlayingExample.value = false
-      }
-      utterance.onerror = () => {
-        isPlayingExample.value = false
-      }
-
-      speechSynthesis.speak(utterance)
+    if (!('speechSynthesis' in window)) {
+      console.warn('Web Speech API not supported')
+      isPlayingExample.value = false
+      return
     }
+
+    // 取消之前的播放
+    speechSynthesis.cancel()
+
+    const utterance = new SpeechSynthesisUtterance(sentence)
+    utterance.lang = 'en-US'
+    utterance.rate = 0.85
+    utterance.pitch = 1
+    utterance.volume = 1
+
+    // 获取语音列表 - 某些浏览器需要等待
+    const getVoices = (): Promise<SpeechSynthesisVoice[]> => {
+      return new Promise((resolve) => {
+        const voices = speechSynthesis.getVoices()
+        if (voices.length > 0) {
+          resolve(voices)
+          return
+        }
+
+        // 如果语音列表为空，等待加载
+        const handler = () => {
+          speechSynthesis.removeEventListener('voiceschanged', handler)
+          resolve(speechSynthesis.getVoices())
+        }
+        speechSynthesis.addEventListener('voiceschanged', handler)
+
+        // 超时处理
+        setTimeout(() => {
+          speechSynthesis.removeEventListener('voiceschanged', handler)
+          resolve(speechSynthesis.getVoices())
+        }, 1000)
+      })
+    }
+
+    const voices = await getVoices()
+    const englishVoice = voices.find(v =>
+      v.lang.startsWith('en') && (v.name.includes('Female') || v.name.includes('Samantha'))
+    ) || voices.find(v => v.lang.startsWith('en'))
+
+    if (englishVoice) {
+      utterance.voice = englishVoice
+    }
+
+    utterance.onend = () => {
+      isPlayingExample.value = false
+    }
+    utterance.onerror = (e) => {
+      console.error('Speech synthesis error:', e)
+      isPlayingExample.value = false
+    }
+
+    // 某些浏览器需要延迟
+    setTimeout(() => {
+      speechSynthesis.speak(utterance)
+    }, 100)
   } catch (error) {
     console.error('Example audio playback failed:', error)
     isPlayingExample.value = false
