@@ -88,7 +88,18 @@
           </div>
           <div class="example" v-if="currentWord.examples?.length">
             <strong>例句：</strong>
-            <p class="example-sentence">{{ currentWord.examples[0].sentence }}</p>
+            <div class="example-content">
+              <p class="example-sentence">{{ currentWord.examples[0].sentence }}</p>
+              <button
+                class="example-audio-btn"
+                :class="{ playing: isPlayingExample }"
+                @click="playExampleAudio"
+                :disabled="isPlayingExample"
+                title="朗读例句"
+              >
+                {{ isPlayingExample ? '🔈' : '🔊' }}
+              </button>
+            </div>
             <p class="translation">{{ currentWord.examples[0].translation }}</p>
           </div>
         </div>
