@@ -4,7 +4,7 @@
  */
 
 import 'reflect-metadata'
-import { AppDataSource } from './data-source'
+import { AppDataSource } from './config/database'
 import { Word } from './entities/Word'
 import * as xlsx from 'xlsx'
 import * as path from 'path'

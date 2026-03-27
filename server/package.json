@@ -24,7 +24,8 @@
     "mysql2": "^3.6.5",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.17",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
