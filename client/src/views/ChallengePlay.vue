@@ -155,6 +155,9 @@ const starRating = ref(0)
 const xpEarned = ref(0)
 const answers = ref<boolean[]>([])
 
+// Question type: 'word-to-meaning' or 'meaning-to-word'
+const questionType = ref<'word-to-meaning' | 'meaning-to-word'>('word-to-meaning')
+
 // Computed
 const currentWord = computed(() => words.value[currentIndex.value])
 const accuracy = computed(() => {
