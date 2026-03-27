@@ -252,9 +252,43 @@ if ('speechSynthesis' in window) {
 }
 
 /**
- * 播放正确提示音 (上升音调)
+ * 播放正确提示音 (语音 "excellent")
  */
 export function playCorrectSound(): void {
+  try {
+    // 使用 Web Speech API 播放 "excellent" 语音
+    if ('speechSynthesis' in window) {
+      speechSynthesis.cancel() // 取消之前的播放
+
+      const utterance = new SpeechSynthesisUtterance('excellent')
+      utterance.lang = 'en-US'
+      utterance.rate = 1.0
+      utterance.pitch = 1.2
+      utterance.volume = 0.8
+
+      // 尝试获取英语语音
+      const voices = speechSynthesis.getVoices()
+      const englishVoice = voices.find(v =>
+        v.lang.startsWith('en') && (v.name.includes('Female') || v.name.includes('Samantha'))
+      ) || voices.find(v => v.lang.startsWith('en'))
+
+      if (englishVoice) {
+        utterance.voice = englishVoice
+      }
+
+      speechSynthesis.speak(utterance)
+    }
+  } catch (error) {
+    console.error('Play correct sound error:', error)
+    // Fallback: 播放音调
+    playCorrectTone()
+  }
+}
+
+/**
+ * 播放正确音调 (fallback)
+ */
+function playCorrectTone(): void {
   try {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
     const oscillator = audioContext.createOscillator()
@@ -276,7 +310,7 @@ export function playCorrectSound(): void {
     oscillator.start(audioContext.currentTime)
     oscillator.stop(audioContext.currentTime + 0.2)
   } catch (error) {
-    console.error('Play correct sound error:', error)
+    console.error('Play correct tone error:', error)
   }
 }
 

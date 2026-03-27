@@ -65,9 +65,15 @@
             <span>天连续打卡</span>
           </div>
           <p class="streak-tip">最长连续: {{ userStats.longestStreak }} 天</p>
-          <button class="btn btn-primary" @click="handleCheckIn" :disabled="checkInLoading">
+          <button
+            class="btn btn-primary"
+            @click="handleCheckIn"
+            :disabled="checkInLoading || !canCheckIn"
+            :title="!canCheckIn ? checkInReason : ''"
+          >
             {{ checkInLoading ? '打卡中...' : '今日打卡' }}
           </button>
+          <p v-if="!canCheckIn" class="checkin-hint">{{ checkInReason }}</p>
         </div>
       </template>
     </div>
@@ -75,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, computed } from 'vue'
 import { useStatsStore, useAuthStore } from '@/stores'
 
 const statsStore = useStatsStore()
@@ -97,6 +103,32 @@ const userStats = reactive({
   totalDays: 0,
   streak: 0,
   longestStreak: 0
+})
+
+// 每日学习目标
+const dailyGoal = computed(() => {
+  const savedSettings = localStorage.getItem('wordStudySettings')
+  if (savedSettings) {
+    const settings = JSON.parse(savedSettings)
+    return settings.dailyNewWords || 20
+  }
+  return 20 // 默认每天20个单词
+})
+
+// 今日已学单词数
+const todayLearnedWords = computed(() => todayStats.newWords + todayStats.review)
+
+// 是否可以手动打卡
+const canCheckIn = computed(() => {
+  return todayLearnedWords.value >= dailyGoal.value
+})
+
+// 不能打卡的原因
+const checkInReason = computed(() => {
+  if (todayLearnedWords.value === 0) {
+    return `今日尚未学习，需完成 ${dailyGoal.value} 个单词才能打卡`
+  }
+  return `今日已学 ${todayLearnedWords.value} 个单词，需完成 ${dailyGoal.value} 个才能打卡`
 })
 
 onMounted(async () => {
@@ -219,5 +251,14 @@ const handleCheckIn = async () => {
 .streak-tip {
   color: var(--text-secondary);
   margin-bottom: 16px;
+}
+
+.checkin-hint {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
 }
 </style>
