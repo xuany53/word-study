@@ -425,13 +425,6 @@ async function playSentenceWithWebSpeech(sentence: string): Promise<boolean> {
   })
 }
 
-    oscillator.start(audioContext.currentTime)
-    oscillator.stop(audioContext.currentTime + 0.3)
-  } catch (error) {
-    console.error('Play wrong sound error:', error)
-  }
-}
-
 export default {
   playWordAudio,
   stopCurrentAudio,
